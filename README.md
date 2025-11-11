@@ -1,28 +1,44 @@
-# Reserva de Vagas - Ônibus Trilheiros
+# Sistema de Reserva de Ônibus 🚌
 
-Este é um site simples para reservar vagas no ônibus dos Trilheiros. O site permite:
-
-- Visualizar a quantidade de vagas restantes em tempo real
-- Inserir nome, telefone e quantidade de vagas
-- Anexar comprovante de pagamento via Pix
-- Exibir mensagem de confirmação ou aviso de ônibus lotado
-- Atualizar automaticamente o número de vagas restantes e bloquear novas reservas quando atingir o limite
-
-## Informações de pagamento
-- Valor por pessoa: R$ 68,00
-- Chave Pix: trilheiros.roomt@gmail.com
-
-## Como usar
-1. Preencha os campos do formulário com seus dados
-2. Anexe o comprovante de pagamento
-3. Clique em "Confirmar reserva"
-4. A contagem de vagas será atualizada automaticamente
-
-## Hospedagem
-Este projeto pode ser hospedado gratuitamente via [GitHub Pages](https://pages.github.com/).  
-Após configurar o GitHub Pages, o link do site será algo como:  
-`https://seunome.github.io/reserva-onibus`
+Este projeto é um sistema simples de reserva de assentos em ônibus, desenvolvido com **HTML, CSS e JavaScript**. Permite selecionar assentos disponíveis, fazer reservas e visualizar a atualização em tempo real.
 
 ---
 
-Criado por Jonatas Marruda
+## 🔗 Acesse online
+
+Você pode acessar o site diretamente pelo GitHub Pages:  
+
+[https://jonatasmarruda-prog.github.io/reserva-onibus/](https://jonatasmarruda-prog.github.io/reserva-onibus/)
+
+---
+
+## ✨ Funcionalidades
+
+- Seleção de assentos disponíveis
+- Reserva de assentos
+- Visualização instantânea de assentos ocupados
+- Interface simples e responsiva
+
+---
+
+## 📸 Demonstração
+
+Aqui está como o site se apresenta:
+
+![Tela inicial](imagens/tela-inicial.png)  
+*Tela inicial com seleção de assentos*
+
+![Reserva de assentos](imagens/reserva-assentos.png)  
+*Assentos reservados aparecem destacados*
+
+> **Observação:** Substitua `imagens/tela-inicial.png` e `imagens/reserva-assentos.png` pelas capturas de tela reais do seu projeto.
+
+---
+
+## 💻 Uso local
+
+Para executar localmente:
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/jonatasmarruda-prog/reserva-onibus.git
