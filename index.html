@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reserva de Ônibus</title>
   <style>
     body {
@@ -20,7 +20,7 @@
     h2 {
       color: white;
       font-size: 20px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
     .container {
       background: #1c1c1c;
@@ -44,24 +44,14 @@
       border-radius: 8px;
       border: none;
       font-size: 15px;
+      background: #222;
+      color: #fff;
     }
-    button {
-      margin-top: 20px;
-      background-color: #25D366;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #1da955;
-    }
-    .total {
+    .total, .vagas {
       font-size: 16px;
       color: #00ff90;
       margin-top: 10px;
+      font-weight: bold;
     }
     .pix-section {
       background: #2c2c2c;
@@ -91,6 +81,40 @@
       color: #00ff90;
       font-size: 14px;
       margin-top: 8px;
+    }
+    button.send-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 12px;
+      background: #25d366;
+      color: #062b17;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button.send-btn:hover {
+      background: #1ebf5a;
+    }
+    button.duvida-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px;
+      background: #f59e0b;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button.duvida-btn:hover {
+      background: #d97706;
+    }
+    footer {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #888;
     }
     .icon {
       width: 22px;
@@ -123,6 +147,7 @@
     </select>
 
     <div class="total" id="valorTotal">Valor total: R$ 0,00</div>
+    <div class="vagas" id="vagasRestantes">Vagas restantes: 45</div>
 
     <div class="pix-section">
       <div class="pix-key">
@@ -135,42 +160,73 @@
 
     <p>Após fazer o pagamento, clique abaixo para enviar sua confirmação via WhatsApp com nome, quantidade e comprovante.</p>
 
-    <button onclick="enviarWhatsApp()">Enviar pelo WhatsApp</button>
+    <button class="send-btn" onclick="enviarWhatsApp()">Enviar pelo WhatsApp</button>
+    <button class="duvida-btn" onclick="duvidaWhatsApp()">Dúvida / Pergunta</button>
+
+    <footer>© 2025 Trilheiros de Rondonópolis</footer>
   </div>
 
   <script>
     const precoPorPessoa = 68;
+    const limiteVagas = 45;
+    let vagasPreenchidas = 0;
+
     const quantidadeInput = document.getElementById("quantidade");
     const valorTotal = document.getElementById("valorTotal");
+    const vagasRestantes = document.getElementById("vagasRestantes");
+    const confirmacao = document.getElementById("confirmacao");
 
-    quantidadeInput.addEventListener("change", () => {
+    quantidadeInput.addEventListener("change", atualizarValor);
+
+    function atualizarValor() {
       const qtd = parseInt(quantidadeInput.value) || 0;
       const total = qtd * precoPorPessoa;
       valorTotal.textContent = `Valor total: R$ ${total.toFixed(2).replace('.', ',')}`;
-    });
+    }
 
     function copiarPix() {
-      const chave = "trilheiros.roomt@gmail.com";
-      navigator.clipboard.writeText(chave);
-      const confirmacao = document.getElementById("confirmacao");
+      navigator.clipboard.writeText("trilheiros.roomt@gmail.com");
       confirmacao.style.display = "block";
       setTimeout(() => confirmacao.style.display = "none", 2500);
     }
 
     function enviarWhatsApp() {
       const nome = document.getElementById("nome").value.trim();
-      const qtd = document.getElementById("quantidade").value;
+      const qtd = parseInt(document.getElementById("quantidade").value);
       if (!nome || !qtd) {
         alert("Preencha o nome e a quantidade de vagas antes de enviar.");
         return;
       }
+      if (vagasPreenchidas + qtd > limiteVagas) {
+        alert("Desculpe, não há vagas suficientes disponíveis.");
+        return;
+      }
+      vagasPreenchidas += qtd;
+      vagasRestantes.textContent = `Vagas restantes: ${limiteVagas - vagasPreenchidas}`;
+
       const total = (qtd * precoPorPessoa).toFixed(2).replace('.', ',');
       const mensagem = `Olá, segue minha reserva.%0A%0ANome(s): ${nome}%0AQuantidade de vagas: ${qtd}%0AValor total: R$ ${total}%0A%0AComprovante em anexo.`;
-      const numero = "5566996926174"; // seu número WhatsApp
+      const numero = "5566996926174";
       const link = `https://wa.me/${numero}?text=${mensagem}`;
       window.open(link, "_blank");
+
+      // Enviar para planilha
+      fetch("URL_DO_SCRIPT?nome=" + encodeURIComponent(nome) +
+            "&quantidade=" + qtd +
+            "&valor=" + encodeURIComponent(total))
+      .then(res => res.text())
+      .then(data => console.log("Registro salvo:", data))
+      .catch(err => console.error("Erro ao registrar:", err));
     }
+
+    function duvidaWhatsApp() {
+      const mensagem = encodeURIComponent("Olá, tenho uma dúvida sobre a reserva do ônibus.");
+      const numero = "5566996926174";
+      window.open(`https://wa.me/${numero}?text=${mensagem}`, "_blank");
+    }
+
+    atualizarValor();
+    vagasRestantes.textContent = `Vagas restantes: ${limiteVagas}`;
   </script>
 </body>
 </html>
-
