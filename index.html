@@ -74,6 +74,44 @@ input, select {
   font-weight: bold;
 }
 
+button.send-btn {
+  margin-top: 18px;
+  width: 100%;
+  padding: 12px;
+  background: #25d366;
+  color: #062b17;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button.send-btn:disabled {
+  background: #888;
+  cursor: not-allowed;
+}
+
+button.send-btn:hover:not(:disabled) {
+  background: #1ebf5a;
+}
+
+.observacao {
+  margin-top: 15px;
+  font-size: 15px;
+  color: #f5d76e;
+  font-weight: bold;
+  display: none;
+}
+
+#lotadoAviso {
+  display: none;
+  color: #ff4d4d;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 15px;
+}
+
 .pix-section {
   background: #2c2c2c;
   padding: 15px;
@@ -108,43 +146,6 @@ input, select {
   margin-top: 8px;
 }
 
-button.send-btn {
-  margin-top: 18px;
-  width: 100%;
-  padding: 12px;
-  background: #25d366;
-  color: #062b17;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-button.send-btn:disabled {
-  background: #888;
-  cursor: not-allowed;
-}
-
-button.send-btn:hover:not(:disabled) {
-  background: #1ebf5a;
-}
-
-.esgotado-msg {
-  margin-top: 12px;
-  color: #ff4d4d;
-  font-weight: bold;
-  display: none;
-}
-
-.observacao {
-  margin-top: 15px;
-  font-size: 15px;
-  color: #f5d76e;
-  font-weight: bold;
-  display: none;
-}
-
 footer {
   margin-top: 18px;
   font-size: 12px;
@@ -163,6 +164,7 @@ footer {
 </div>
 
 <div class="container">
+
   <label for="nome">Nome completo:</label>
   <input type="text" id="nome" placeholder="Ex: João Silva" required>
 
@@ -183,7 +185,8 @@ footer {
 
   <div class="total" id="valorTotal">Valor total: R$ 0,00</div>
   <div class="vagas" id="vagasRestantes">Vagas restantes: 44</div>
-  <div class="esgotado-msg" id="esgotadoMsg">🚌 Ônibus lotado. Todas as vagas foram preenchidas.</div>
+
+  <p id="lotadoAviso">🚌 Ônibus lotado. Todas as vagas foram preenchidas.</p>
 
   <div class="pix-section">
     <div class="pix-key">
@@ -196,7 +199,7 @@ footer {
   <button id="sendBtn" class="send-btn" onclick="confirmarReserva()">Confirmar reserva</button>
 
   <p id="obs" class="observacao">
-    ⚠️ Para concluir sua reserva, envie seu nome e o comprovante de pagamento pelo WhatsApp.
+    Para concluir sua reserva, envie seu nome e o comprovante de pagamento pelo WhatsApp.
   </p>
 
   <button id="zapBtn" class="send-btn" style="display:none; background:#128C7E; color:white;" onclick="enviarWhatsApp()">
@@ -207,18 +210,26 @@ footer {
 </div>
 
 <script>
+
 const precoPorPessoa = 69;
 const limiteVagas = 44;
 let vagasPreenchidas = 0;
 
-function atualizarValor() {
-  const qtd = parseInt(document.getElementById("quantidade").value) || 0;
-  const total = qtd * precoPorPessoa;
-  document.getElementById("valorTotal").textContent =
-    `Valor total: R$ ${total.toFixed(2).replace('.', ',')}`;
-}
+const quantidadeInput = document.getElementById("quantidade");
+const valorTotal = document.getElementById("valorTotal");
+const vagasRestantes = document.getElementById("vagasRestantes");
+const lotadoAviso = document.getElementById("lotadoAviso");
+const sendBtn = document.getElementById("sendBtn");
+const obs = document.getElementById("obs");
+const zapBtn = document.getElementById("zapBtn");
 
-document.getElementById("quantidade").addEventListener("change", atualizarValor);
+quantidadeInput.addEventListener("change", atualizarValor);
+
+function atualizarValor() {
+  const qtd = parseInt(quantidadeInput.value) || 0;
+  const total = qtd * precoPorPessoa;
+  valorTotal.textContent = `Valor total: R$ ${total.toFixed(2).replace('.', ',')}`;
+}
 
 function copiarPix() {
   navigator.clipboard.writeText("trilheiros.roomt@gmail.com");
@@ -228,7 +239,7 @@ function copiarPix() {
 
 function confirmarReserva() {
   const nome = document.getElementById("nome").value.trim();
-  const qtd = parseInt(document.getElementById("quantidade").value);
+  const qtd = parseInt(quantidadeInput.value);
 
   if (!nome || !qtd) {
     alert("Preencha nome e quantidade de vagas.");
@@ -236,7 +247,10 @@ function confirmarReserva() {
   }
 
   if (vagasPreenchidas + qtd > limiteVagas) {
-    alert("Ônibus lotado. Todas as vagas foram preenchidas.");
+    lotadoAviso.style.display = "block";
+    sendBtn.disabled = true;
+    zapBtn.style.display = "none";
+    obs.style.display = "none";
     return;
   }
 
@@ -245,13 +259,13 @@ function confirmarReserva() {
 
   alert("Reserva confirmada.");
 
-  document.getElementById("obs").style.display = "block";
-  document.getElementById("zapBtn").style.display = "block";
+  obs.style.display = "block";
+  zapBtn.style.display = "block";
 }
 
 function enviarWhatsApp() {
   const nome = document.getElementById("nome").value.trim();
-  const qtd = parseInt(document.getElementById("quantidade").value);
+  const qtd = parseInt(quantidadeInput.value);
   const total = (qtd * precoPorPessoa).toFixed(2).replace('.', ',');
 
   const mensagem =
@@ -263,17 +277,19 @@ function enviarWhatsApp() {
 }
 
 function atualizarContadorTela() {
-  const restantes = limiteVagas - vagasPreenchidas;
-  document.getElementById("vagasRestantes").textContent =
-    `Vagas restantes: ${restantes}`;
+  const restantes = Math.max(limiteVagas - vagasPreenchidas, 0);
+  vagasRestantes.textContent = `Vagas restantes: ${restantes}`;
 
   if (vagasPreenchidas >= limiteVagas) {
-    document.getElementById("sendBtn").disabled = true;
-    document.getElementById("esgotadoMsg").style.display = "block";
+    sendBtn.disabled = true;
+    zapBtn.style.display = "none";
+    obs.style.display = "none";
+    lotadoAviso.style.display = "block";
   }
 }
 
 atualizarValor();
+
 </script>
 
 </body>
