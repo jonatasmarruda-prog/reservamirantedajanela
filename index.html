@@ -11,40 +11,111 @@
 
 <style>
 body {
-  background:#0f2027;
-  color:#fff;
-  font-family:Arial;
-  text-align:center;
-  padding:15px;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(180deg,#0f2027,#203a43,#2c5364);
+  font-family: Arial, sans-serif;
+  color: #fff;
 }
+
 .container {
-  background:#111;
-  max-width:420px;
-  margin:auto;
-  padding:20px;
-  border-radius:15px;
+  max-width: 420px;
+  margin: auto;
+  padding: 15px;
 }
+
+.banner {
+  width: 100%;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+  margin-bottom: 15px;
+}
+
+.card {
+  background: #111;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+
+h1 {
+  text-align: center;
+  color: #00ffd5;
+  text-shadow: 0 0 10px #00ffd580;
+}
+
+.info {
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.vagas {
+  text-align: center;
+  font-weight: bold;
+  color: #00ffcc;
+}
+
+.alerta {
+  color: #ff5c5c;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
 input, textarea {
-  width:90%;
-  padding:10px;
-  margin:8px 0;
-  border-radius:8px;
-  border:none;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 10px;
+  font-size: 16px;
 }
+
 button {
-  width:100%;
-  padding:14px;
-  margin-top:10px;
-  font-size:16px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
+  width: 100%;
+  padding: 15px;
+  margin-top: 12px;
+  font-size: 17px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
 }
-.btn-pix { background:#00c6ff; color:#fff; }
-.btn-zap { background:#25d366; color:#fff; }
-.bloqueado { background:#555; cursor:not-allowed; }
-.info { color:#00ffcc; font-weight:bold; }
-.alerta { color:#ff5c5c; font-weight:bold; }
+
+.btn-pix {
+  background: linear-gradient(145deg,#00c6ff,#0072ff);
+  color: white;
+  box-shadow: 0 6px 0 #004c99;
+}
+
+.btn-pix:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #004c99;
+}
+
+.btn-whats {
+  background: linear-gradient(145deg,#25d366,#128c7e);
+  color: white;
+  box-shadow: 0 6px 0 #0b5e3b;
+}
+
+.btn-whats:active {
+  transform: translateY(4px);
+}
+
+.bloqueado {
+  background: #555 !important;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.footer-msg {
+  margin-top: 10px;
+  color: #00ffd5;
+  text-align: center;
+}
 </style>
 </head>
 
@@ -52,48 +123,35 @@ button {
 
 <div class="container">
 
-<h2>🌄 Trilha Mirante da Janela</h2>
-<p>📅 25 de Janeiro | ⏰ 4h da manhã</p>
-<p>💰 R$ 15,00 por pessoa</p>
+<img class="banner"
+src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-amarelo-laranja.png">
 
-<p class="info">🎟️ Vagas restantes: <span id="vagas">...</span></p>
+<div class="card">
+
+<h1>🌄 Trilha Mirante da Janela</h1>
+
+<p class="info">📅 25 de Janeiro • ⏰ 4h da manhã</p>
+<p class="info">💰 R$ 15,00 por pessoa</p>
+
+<p class="vagas">🎟️ Vagas restantes: <span id="vagas">...</span></p>
 
 <p class="alerta">
-⚠️ Se for pagar para mais de uma pessoa, informe o nome de TODOS.
+⚠️ Se for pagar para mais de uma pessoa, informe o nome de todos.
 </p>
 
-<div>
-  <button onclick="modoUm()">👤 1 Pessoa</button>
-  <button onclick="modoVarios()">👥 Mais Pessoas</button>
-</div>
-
-<div id="umNome">
-  <input type="text" id="nomeUnico" placeholder="Nome da pessoa">
-</div>
-
-<div id="variosNomes" style="display:none;">
-  <textarea id="listaNomes" rows="4"
-    placeholder="Digite um nome por linha"></textarea>
-</div>
+<input type="text" id="nome" placeholder="Nome da pessoa ou responsáveis">
 
 <input type="number" id="qtd" value="1" min="1">
 
-<p id="total">Total: R$ 15,00</p>
+<button class="btn-pix" id="btnPix" onclick="copiarPix()">💳 COPIAR PIX</button>
 
-<button id="btnPix" class="btn-pix" onclick="copiarPix()">💳 COPIAR PIX</button>
+<div id="msg" class="footer-msg"></div>
 
-<p id="msg"></p>
+<a id="btnWhats" class="btn-whats" style="display:none;" target="_blank">
+📲 ENVIAR COMPROVANTE
+</a>
 
-<div id="confirmacao" style="display:none;">
-  <p class="info">✅ Pagamento realizado!</p>
-  <p>Clique abaixo e envie o comprovante para o Jonatas:</p>
-  <a id="linkWhats"
-     class="btn-zap"
-     style="display:block;text-decoration:none;">
-     📲 ENVIAR COMPROVANTE
-  </a>
 </div>
-
 </div>
 
 <script>
@@ -111,19 +169,6 @@ firebase.initializeApp(firebaseConfig);
 const ref = firebase.database().ref("vagas");
 
 const valor = 15;
-let modo = "um";
-
-function modoUm() {
-  modo = "um";
-  document.getElementById("umNome").style.display = "block";
-  document.getElementById("variosNomes").style.display = "none";
-}
-
-function modoVarios() {
-  modo = "varios";
-  document.getElementById("umNome").style.display = "none";
-  document.getElementById("variosNomes").style.display = "block";
-}
 
 ref.on("value", snap => {
   const vagas = snap.val();
@@ -137,32 +182,30 @@ ref.on("value", snap => {
 });
 
 function copiarPix() {
-  let nomes = modo === "um"
-    ? document.getElementById("nomeUnico").value
-    : document.getElementById("listaNomes").value;
-
-  if (!nomes.trim()) {
-    alert("⚠️ Informe o nome da(s) pessoa(s).");
-    return;
-  }
-
+  const nome = document.getElementById("nome").value.trim();
   const qtd = document.getElementById("qtd").value;
   const total = qtd * valor;
 
-  ref.transaction(v => v >= qtd ? v - qtd : v);
+  if (!nome) {
+    alert("Informe o nome antes de continuar.");
+    return;
+  }
 
   navigator.clipboard.writeText("trilheiros.roomt@gmail.com");
 
-  const msg =
-    "Olá Jonatas! 😊%0A" +
-    "Confirmação da *Trilha Mirante da Janela* 🌄%0A%0A" +
-    "👤 Nome(s): " + nomes.replace(/\n/g, ", ") + "%0A" +
-    "🎟️ Vagas: " + qtd + "%0A" +
-    "💰 Valor: R$ " + total.toFixed(2).replace(".", ",") + "%0A%0A" +
-    "Pagamento realizado via Pix ✅";
+  document.getElementById("msg").innerHTML =
+    "✅ Pix copiado! Agora envie o comprovante.";
 
-  document.getElementById("confirmacao").style.display = "block";
-  document.getElementById("linkWhats").href =
+  const msg =
+    "Olá! 😊%0A" +
+    "Pagamento da *Trilha Mirante da Janela* 🌄%0A" +
+    "👤 Nome: " + nome + "%0A" +
+    "👥 Vagas: " + qtd + "%0A" +
+    "💰 Valor: R$ " + total.toFixed(2).replace('.', ',') + "%0A%0A" +
+    "Segue o comprovante.";
+
+  document.getElementById("btnWhats").style.display = "block";
+  document.getElementById("btnWhats").href =
     "https://wa.me/5566996926174?text=" + msg;
 }
 </script>
