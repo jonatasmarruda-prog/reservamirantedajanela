@@ -5,16 +5,11 @@
 <title>Trilha Mirante da Janela</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
 <style>
 body {
   margin: 0;
-  padding: 0;
-  background: linear-gradient(180deg,#0f2027,#203a43,#2c5364);
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(180deg,#0b1f2a,#0f2f3a,#143f4a);
   color: #fff;
 }
 
@@ -26,95 +21,98 @@ body {
 
 .banner {
   width: 100%;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.8);
   margin-bottom: 15px;
 }
 
 .card {
-  background: #111;
-  padding: 20px;
+  background: #0e1c24;
   border-radius: 18px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.7);
 }
 
 h1 {
   text-align: center;
   color: #00ffd5;
-  text-shadow: 0 0 10px #00ffd580;
+  margin-bottom: 5px;
+  text-shadow: 0 0 10px rgba(0,255,213,.4);
+}
+
+.sub {
+  text-align: center;
+  font-size: 15px;
+  opacity: 0.9;
 }
 
 .info {
+  background: #102a35;
+  border-radius: 12px;
+  padding: 10px;
+  margin: 12px 0;
   text-align: center;
-  font-size: 16px;
-  margin-bottom: 10px;
 }
 
-.vagas {
-  text-align: center;
-  font-weight: bold;
-  color: #00ffcc;
+.info span {
+  display: block;
+  margin: 5px 0;
 }
 
-.alerta {
-  color: #ff5c5c;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 10px;
-}
-
-input, textarea {
+input {
   width: 100%;
   padding: 12px;
+  margin-top: 10px;
   border-radius: 10px;
   border: none;
-  margin-top: 10px;
   font-size: 16px;
 }
 
 button {
   width: 100%;
+  margin-top: 14px;
   padding: 15px;
-  margin-top: 12px;
-  font-size: 17px;
   border-radius: 12px;
   border: none;
-  cursor: pointer;
+  font-size: 17px;
   font-weight: bold;
+  cursor: pointer;
   transition: 0.2s;
 }
 
 .btn-pix {
-  background: linear-gradient(145deg,#00c6ff,#0072ff);
-  color: white;
-  box-shadow: 0 6px 0 #004c99;
+  background: linear-gradient(145deg,#00d2ff,#0066ff);
+  color: #fff;
+  box-shadow: 0 6px 0 #003c99;
 }
 
 .btn-pix:active {
   transform: translateY(4px);
-  box-shadow: 0 2px 0 #004c99;
+  box-shadow: 0 2px 0 #003c99;
 }
 
-.btn-whats {
+.btn-zap {
   background: linear-gradient(145deg,#25d366,#128c7e);
-  color: white;
-  box-shadow: 0 6px 0 #0b5e3b;
+  color: #fff;
+  box-shadow: 0 6px 0 #0a5c3b;
+  display: none;
 }
 
-.btn-whats:active {
+.btn-zap:active {
   transform: translateY(4px);
 }
 
-.bloqueado {
-  background: #555 !important;
-  box-shadow: none;
-  cursor: not-allowed;
-}
-
-.footer-msg {
+.msg {
   margin-top: 10px;
   color: #00ffd5;
   text-align: center;
+}
+
+.footer {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.8;
 }
 </style>
 </head>
@@ -123,92 +121,66 @@ button {
 
 <div class="container">
 
-<img class="banner"
-src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-amarelo-laranja.png">
+<img class="banner" src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-amarelo-laranja.png">
 
 <div class="card">
 
 <h1>🌄 Trilha Mirante da Janela</h1>
+<p class="sub">Aventura • Natureza • Experiência única</p>
 
-<p class="info">📅 25 de Janeiro • ⏰ 4h da manhã</p>
-<p class="info">💰 R$ 15,00 por pessoa</p>
+<div class="info">
+  <span>📅 25 de Janeiro</span>
+  <span>⏰ Saída: 4h da manhã</span>
+  <span>💰 Valor: R$ 15,00 por pessoa</span>
+</div>
 
-<p class="vagas">🎟️ Vagas restantes: <span id="vagas">...</span></p>
-
-<p class="alerta">
-⚠️ Se for pagar para mais de uma pessoa, informe o nome de todos.
-</p>
-
-<input type="text" id="nome" placeholder="Nome da pessoa ou responsáveis">
-
+<input type="text" id="nome" placeholder="Digite seu nome">
 <input type="number" id="qtd" value="1" min="1">
 
-<button class="btn-pix" id="btnPix" onclick="copiarPix()">💳 COPIAR PIX</button>
+<button class="btn-pix" onclick="copiarPix()">💳 COPIAR PIX</button>
 
-<div id="msg" class="footer-msg"></div>
+<p class="msg" id="msg"></p>
 
-<a id="btnWhats" class="btn-whats" style="display:none;" target="_blank">
+<a id="btnWhats" class="btn-zap" target="_blank">
 📲 ENVIAR COMPROVANTE
 </a>
 
 </div>
+
+<div class="footer">
+  Após o pagamento, envie o comprovante para confirmação da vaga.
+</div>
+
 </div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "trilha-mirante.firebaseapp.com",
-  databaseURL: "https://trilha-mirante-default-rtdb.firebaseio.com",
-  projectId: "trilha-mirante",
-  storageBucket: "trilha-mirante.appspot.com",
-  messagingSenderId: "SEU_ID",
-  appId: "SEU_APP_ID"
-};
-
-firebase.initializeApp(firebaseConfig);
-const ref = firebase.database().ref("vagas");
-
-const valor = 15;
-
-ref.on("value", snap => {
-  const vagas = snap.val();
-  document.getElementById("vagas").innerText = vagas;
-
-  if (vagas <= 0) {
-    document.getElementById("btnPix").disabled = true;
-    document.getElementById("btnPix").innerText = "VAGAS ESGOTADAS";
-    document.getElementById("btnPix").classList.add("bloqueado");
-  }
-});
-
 function copiarPix() {
-  const nome = document.getElementById("nome").value.trim();
+  const nome = document.getElementById("nome").value;
   const qtd = document.getElementById("qtd").value;
-  const total = qtd * valor;
 
   if (!nome) {
-    alert("Informe o nome antes de continuar.");
+    alert("Informe seu nome.");
     return;
   }
 
   navigator.clipboard.writeText("trilheiros.roomt@gmail.com");
 
-  document.getElementById("msg").innerHTML =
+  document.getElementById("msg").innerText =
     "✅ Pix copiado! Agora envie o comprovante.";
 
-  const msg =
+  const texto =
     "Olá! 😊%0A" +
     "Pagamento da *Trilha Mirante da Janela* 🌄%0A" +
-    "👤 Nome: " + nome + "%0A" +
-    "👥 Vagas: " + qtd + "%0A" +
-    "💰 Valor: R$ " + total.toFixed(2).replace('.', ',') + "%0A%0A" +
-    "Segue o comprovante.";
+    "Nome: " + nome + "%0A" +
+    "Vagas: " + qtd + "%0A" +
+    "Valor: R$ " + (qtd * 15).toFixed(2).replace(".", ",") + "%0A";
 
   document.getElementById("btnWhats").style.display = "block";
   document.getElementById("btnWhats").href =
-    "https://wa.me/5566996926174?text=" + msg;
+    "https://wa.me/5566996926174?text=" + texto;
 }
 </script>
 
 </body>
 </html>
+
