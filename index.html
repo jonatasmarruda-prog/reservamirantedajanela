@@ -113,25 +113,23 @@ Maria Silva
 João Pereira"
 oninput="validarFormulario()"></textarea>
 
+<div style="
+  margin-top:10px;
+  padding:12px;
+  background:#0f2f3a;
+  border-radius:10px;
+  text-align:center;
+  font-size:14px;
+">
+  💳 Após preencher os nomes, realize o pagamento via Pix.<br>
+  📲 Em seguida, clique no botão abaixo para enviar o comprovante.
+</div>
+
 <input type="number" id="qtd" value="1" min="1" onchange="atualizarTotal()">
 
 <p id="total" style="text-align:center;font-weight:bold;color:#00ffd5;">
 💰 Total: R$ 15,00
 </p>
-
-<div id="aviso" style="
-  margin-top:12px;
-  padding:12px;
-  background:#0f2f3a;
-  border-radius:10px;
-  text-align:center;
-  opacity:0;
-  transition:0.4s;
-">
-  <p style="color:#00ffd5;font-weight:bold;">💳 Atenção</p>
-  <p>Após preencher os nomes, realize o pagamento via Pix.<br>
-  Depois clique no botão abaixo para enviar o comprovante.</p>
-</div>
 
 <button id="btnPix" class="btn-3d" onclick="reservar()" disabled>
 💳 GARANTIR MINHA VAGA
@@ -160,14 +158,11 @@ function atualizarTotal() {
 
 function validarFormulario() {
   const nomes = document.getElementById("nomes").value.trim();
-  const aviso = document.getElementById("aviso");
   const botao = document.getElementById("btnPix");
 
   if (nomes.length > 2) {
-    aviso.style.opacity = "1";
     botao.disabled = false;
   } else {
-    aviso.style.opacity = "0";
     botao.disabled = true;
   }
 }
