@@ -56,7 +56,6 @@ h1 {
   text-align: center;
   color: #ffd700;
   font-weight: bold;
-  margin-top: 8px;
 }
 
 textarea, input {
@@ -99,11 +98,6 @@ button {
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
-
-.bloqueado {
-  background: #555 !important;
-  animation: none;
-}
 </style>
 </head>
 
@@ -121,7 +115,7 @@ src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-
 <p class="info">📅 25 de Janeiro • ⏰ 4h da manhã</p>
 <p class="info">💰 R$ 15,00 por pessoa</p>
 
-<p class="vagas">🎟️ Vagas restantes: <span id="vagas">...</span></p>
+<p class="vagas">🎟️ Vagas limitadas</p>
 
 <p class="alerta">📝 Informe o nome de todos os participantes</p>
 
@@ -136,13 +130,13 @@ João Pereira"></textarea>
 💰 Total: R$ 15,00
 </p>
 
-<button id="btnPix" class="btn-3d" onclick="reservar()">
+<button class="btn-3d" onclick="reservar()">
 💳 GARANTIR MINHA VAGA
 </button>
 
-<div id="avisoPagamento" style="display:none;margin-top:15px;text-align:center;">
+<div id="msgPagamento" style="display:none;margin-top:15px;text-align:center;">
   <p style="color:#00ffd5;font-weight:bold;">
-    ✅ Pagamento realizado!
+    ✅ Pagamento iniciado!
   </p>
   <p>Agora envie o comprovante pelo WhatsApp.</p>
 
@@ -155,60 +149,33 @@ João Pereira"></textarea>
 </div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "trilha-mirante.firebaseapp.com",
-  databaseURL: "https://trilha-mirante-default-rtdb.firebaseio.com",
-  projectId: "trilha-mirante",
-  storageBucket: "trilha-mirante.appspot.com",
-  messagingSenderId: "SEU_ID",
-  appId: "SEU_APP_ID"
-};
-
-firebase.initializeApp(firebaseConfig);
-const ref = firebase.database().ref("vagas");
-
 const valor = 15;
-
-ref.on("value", snap => {
-  const vagas = snap.val();
-  document.getElementById("vagas").innerText = vagas;
-
-  if (vagas <= 0) {
-    document.getElementById("btnPix").disabled = true;
-    document.getElementById("btnPix").innerText = "🚫 VAGAS ESGOTADAS";
-    document.getElementById("btnPix").classList.add("bloqueado");
-  }
-});
 
 function atualizarTotal() {
   const qtd = document.getElementById("qtd").value;
-  const total = qtd * valor;
   document.getElementById("total").innerText =
-    "💰 Total: R$ " + total.toFixed(2).replace(".", ",");
+    "💰 Total: R$ " + (qtd * valor).toFixed(2).replace(".", ",");
 }
 
 function reservar() {
   const nomes = document.getElementById("nomes").value.trim();
-  const qtd = parseInt(document.getElementById("qtd").value);
+  const qtd = document.getElementById("qtd").value;
 
   if (!nomes) {
     alert("Informe o nome das pessoas.");
     return;
   }
 
-  const total = qtd * valor;
-
   navigator.clipboard.writeText("trilheiros.roomt@gmail.com");
 
-  document.getElementById("avisoPagamento").style.display = "block";
+  document.getElementById("msgPagamento").style.display = "block";
 
   const msg =
     "Olá! 😊%0A" +
     "Confirmação da *Trilha Mirante da Janela* 🌄%0A%0A" +
     "👥 Nome(s):%0A" + nomes.replace(/\n/g, "%0A") + "%0A%0A" +
     "🎟️ Vagas: " + qtd + "%0A" +
-    "💰 Valor: R$ " + total.toFixed(2).replace(".", ",") + "%0A";
+    "💰 Valor: R$ " + (qtd * valor).toFixed(2).replace(".", ",") + "%0A";
 
   document.getElementById("btnWhats").onclick = () => {
     window.open(
@@ -221,4 +188,3 @@ function reservar() {
 
 </body>
 </html>
-
