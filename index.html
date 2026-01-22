@@ -9,18 +9,56 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-body {margin:0;background:#0f2027;font-family:Arial;color:#fff}
-.container{max-width:420px;margin:auto;padding:15px}
-.banner{width:100%;border-radius:16px;margin-bottom:15px}
-.card{background:#111;border-radius:18px;padding:20px}
-h1{text-align:center;color:#00ffd5}
-.info{text-align:center}
-.vagas{text-align:center;color:#00ffcc;font-weight:bold;margin:10px 0}
-textarea,input{width:100%;padding:12px;border-radius:10px;border:none;margin-top:10px}
-button{width:100%;padding:16px;border-radius:40px;border:none;font-size:18px;font-weight:bold}
-.btn{background:linear-gradient(180deg,#2e9cff,#0066ff);color:#fff}
-.btn-wpp{background:linear-gradient(180deg,#25d366,#128c7e)}
-.bloqueado{background:#555!important}
+body {
+  margin: 0;
+  background: linear-gradient(180deg,#0f2027,#203a43,#2c5364);
+  font-family: Arial;
+  color: #fff;
+}
+.container {
+  max-width: 420px;
+  margin: auto;
+  padding: 15px;
+}
+.banner {
+  width: 100%;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+.card {
+  background: #111;
+  border-radius: 18px;
+  padding: 20px;
+}
+h1 { text-align:center; color:#00ffd5; }
+.info { text-align:center; }
+.vagas { text-align:center; color:#00ffcc; font-weight:bold; }
+textarea, input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 10px;
+}
+button {
+  width: 100%;
+  padding: 16px;
+  border-radius: 40px;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 12px;
+}
+.btn {
+  background: linear-gradient(180deg,#2e9cff,#0066ff);
+  color: #fff;
+}
+.btn-wpp {
+  background: linear-gradient(180deg,#25d366,#128c7e);
+}
+.bloqueado {
+  background: #555 !important;
+}
 </style>
 </head>
 
@@ -40,9 +78,9 @@ src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-
 
 <p class="vagas">🎟️ Vagas restantes: <span id="vagas">...</span></p>
 
-<textarea id="nomes" placeholder="Digite os nomes (um por linha)"></textarea>
+<textarea id="nomes" placeholder="Digite o nome das pessoas (um por linha)"></textarea>
 
-<div style="margin:10px 0;background:#0f2f3a;padding:10px;border-radius:10px;text-align:center">
+<div style="margin-top:10px;background:#0f2f3a;padding:10px;border-radius:10px;text-align:center">
 💳 Após preencher os nomes, realize o pagamento via Pix.<br>
 📲 Depois clique no botão para enviar o comprovante.
 </div>
@@ -52,8 +90,8 @@ src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-
 <button id="btnPix" class="btn" onclick="confirmar()">💳 GARANTIR MINHA VAGA</button>
 
 <div id="final" style="display:none;text-align:center;margin-top:15px">
-<p style="color:#00ffd5;font-weight:bold">✅ Pagamento iniciado!</p>
-<button id="btnWpp" class="btn btn-wpp">📲 ENVIAR COMPROVANTE</button>
+  <p style="color:#00ffd5;font-weight:bold;">✅ Pagamento iniciado!</p>
+  <button id="btnWpp" class="btn btn-wpp">📲 ENVIAR COMPROVANTE</button>
 </div>
 
 </div>
@@ -62,23 +100,24 @@ src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-
 <script>
 const firebaseConfig = {
   apiKey: "SUA_API_KEY",
-  authDomain: "reservamirantedajanela.firebaseapp.com",
-  databaseURL: "https://reservamirantedajanela-default-rtdb.firebaseio.com",
-  projectId: "reservamirantedajanela",
-  storageBucket: "reservamirantedajanela.appspot.com",
+  authDomain: "trilha-mirante.firebaseapp.com",
+  databaseURL: "https://trilha-mirante-default-rtdb.firebaseio.com",
+  projectId: "trilha-mirante",
+  storageBucket: "trilha-mirante.appspot.com",
   messagingSenderId: "SEU_ID",
   appId: "SEU_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.database();
 const vagasRef = db.ref("vagas/total");
 
 vagasRef.on("value", snap => {
-  const v = snap.val();
-  document.getElementById("vagas").innerText = v;
+  const vagas = snap.val();
+  document.getElementById("vagas").innerText = vagas;
 
-  if (v <= 0) {
+  if (vagas <= 0) {
     document.getElementById("btnPix").disabled = true;
     document.getElementById("btnPix").innerText = "🚫 VAGAS ESGOTADAS";
     document.getElementById("btnPix").classList.add("bloqueado");
