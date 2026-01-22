@@ -5,89 +5,22 @@
 <title>Trilha Mirante da Janela</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
 <style>
-body {
-  margin: 0;
-  background: linear-gradient(180deg,#0f2027,#203a43,#2c5364);
-  font-family: Arial, sans-serif;
-  color: #fff;
-}
-
-.container {
-  max-width: 420px;
-  margin: auto;
-  padding: 15px;
-}
-
-.banner {
-  width: 100%;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.7);
-  margin-bottom: 15px;
-}
-
-.card {
-  background: #111;
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 15px 30px rgba(0,0,0,.7);
-}
-
-h1 {
-  text-align: center;
-  color: #00ffd5;
-}
-
-.info {
-  text-align: center;
-  margin: 6px 0;
-}
-
-.alerta {
-  text-align: center;
-  color: #ffd700;
-  font-weight: bold;
-}
-
-textarea, input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
-}
-
-button {
-  width: 100%;
-  padding: 16px;
-  margin-top: 14px;
-  border-radius: 40px;
-  border: none;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-3d {
-  background: linear-gradient(180deg,#2e9cff,#0066ff);
-  color: #fff;
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.4),
-    0 6px 0 rgba(0,0,0,0.3),
-    0 10px 15px rgba(0,0,0,0.4);
-  animation: pulse 1.5s infinite;
-}
-
-.btn-whats {
-  background: linear-gradient(180deg,#25d366,#128c7e);
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
+body {margin:0;background:#0f2027;font-family:Arial;color:#fff}
+.container{max-width:420px;margin:auto;padding:15px}
+.banner{width:100%;border-radius:16px;margin-bottom:15px}
+.card{background:#111;border-radius:18px;padding:20px}
+h1{text-align:center;color:#00ffd5}
+.info{text-align:center}
+.vagas{text-align:center;color:#00ffcc;font-weight:bold;margin:10px 0}
+textarea,input{width:100%;padding:12px;border-radius:10px;border:none;margin-top:10px}
+button{width:100%;padding:16px;border-radius:40px;border:none;font-size:18px;font-weight:bold}
+.btn{background:linear-gradient(180deg,#2e9cff,#0066ff);color:#fff}
+.btn-wpp{background:linear-gradient(180deg,#25d366,#128c7e)}
+.bloqueado{background:#555!important}
 </style>
 </head>
 
@@ -102,91 +35,83 @@ src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-
 
 <h1>🌄 Trilha Mirante da Janela</h1>
 
-<p class="info">📅 25 de Janeiro • ⏰ 4h da manhã</p>
+<p class="info">📅 25 de Janeiro • ⏰ 4h</p>
 <p class="info">💰 R$ 15,00 por pessoa</p>
 
-<p class="alerta">📝 Informe o nome de todos os participantes</p>
+<p class="vagas">🎟️ Vagas restantes: <span id="vagas">...</span></p>
 
-<textarea id="nomes" rows="4"
-placeholder="Ex:
-Maria Silva
-João Pereira"
-oninput="validarFormulario()"></textarea>
+<textarea id="nomes" placeholder="Digite os nomes (um por linha)"></textarea>
 
-<div style="
-  margin-top:10px;
-  padding:12px;
-  background:#0f2f3a;
-  border-radius:10px;
-  text-align:center;
-  font-size:14px;
-">
-  💳 Após preencher os nomes, realize o pagamento via Pix.<br>
-  📲 Em seguida, clique no botão abaixo para enviar o comprovante.
+<div style="margin:10px 0;background:#0f2f3a;padding:10px;border-radius:10px;text-align:center">
+💳 Após preencher os nomes, realize o pagamento via Pix.<br>
+📲 Depois clique no botão para enviar o comprovante.
 </div>
 
-<input type="number" id="qtd" value="1" min="1" onchange="atualizarTotal()">
+<input type="number" id="qtd" value="1" min="1">
 
-<p id="total" style="text-align:center;font-weight:bold;color:#00ffd5;">
-💰 Total: R$ 15,00
-</p>
+<button id="btnPix" class="btn" onclick="confirmar()">💳 GARANTIR MINHA VAGA</button>
 
-<button id="btnPix" class="btn-3d" onclick="reservar()" disabled>
-💳 GARANTIR MINHA VAGA
-</button>
-
-<div id="finalMsg" style="display:none;margin-top:15px;text-align:center;">
-  <p style="color:#00ffd5;font-weight:bold;">✅ Pagamento iniciado!</p>
-  <p>Agora envie o comprovante pelo WhatsApp.</p>
-
-  <button id="btnWhats" class="btn-3d btn-whats">
-    📲 ENVIAR COMPROVANTE
-  </button>
+<div id="final" style="display:none;text-align:center;margin-top:15px">
+<p style="color:#00ffd5;font-weight:bold">✅ Pagamento iniciado!</p>
+<button id="btnWpp" class="btn btn-wpp">📲 ENVIAR COMPROVANTE</button>
 </div>
 
 </div>
 </div>
 
 <script>
-const valor = 15;
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "reservamirantedajanela.firebaseapp.com",
+  databaseURL: "https://reservamirantedajanela-default-rtdb.firebaseio.com",
+  projectId: "reservamirantedajanela",
+  storageBucket: "reservamirantedajanela.appspot.com",
+  messagingSenderId: "SEU_ID",
+  appId: "SEU_APP_ID"
+};
 
-function atualizarTotal() {
-  const qtd = document.getElementById("qtd").value;
-  document.getElementById("total").innerText =
-    "💰 Total: R$ " + (qtd * valor).toFixed(2).replace(".", ",");
-}
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const vagasRef = db.ref("vagas/total");
 
-function validarFormulario() {
-  const nomes = document.getElementById("nomes").value.trim();
-  const botao = document.getElementById("btnPix");
+vagasRef.on("value", snap => {
+  const v = snap.val();
+  document.getElementById("vagas").innerText = v;
 
-  if (nomes.length > 2) {
-    botao.disabled = false;
-  } else {
-    botao.disabled = true;
+  if (v <= 0) {
+    document.getElementById("btnPix").disabled = true;
+    document.getElementById("btnPix").innerText = "🚫 VAGAS ESGOTADAS";
+    document.getElementById("btnPix").classList.add("bloqueado");
   }
-}
+});
 
-function reservar() {
+function confirmar() {
   const nomes = document.getElementById("nomes").value.trim();
-  const qtd = document.getElementById("qtd").value;
+  const qtd = parseInt(document.getElementById("qtd").value);
+
+  if (!nomes) {
+    alert("Informe os nomes.");
+    return;
+  }
+
+  vagasRef.transaction(v => {
+    if (v >= qtd) return v - qtd;
+    else return v;
+  });
 
   navigator.clipboard.writeText("trilheiros.roomt@gmail.com");
 
-  document.getElementById("finalMsg").style.display = "block";
+  document.getElementById("final").style.display = "block";
 
   const msg =
     "Olá! 😊%0A" +
-    "Confirmação da *Trilha Mirante da Janela* 🌄%0A%0A" +
-    "👥 Nome(s):%0A" + nomes.replace(/\n/g, "%0A") + "%0A%0A" +
-    "🎟️ Vagas: " + qtd + "%0A" +
-    "💰 Valor: R$ " + (qtd * valor).toFixed(2).replace(".", ",") + "%0A";
+    "Confirmação da Trilha Mirante da Janela 🌄%0A%0A" +
+    "👥 Nomes:%0A" + nomes.replace(/\n/g,"%0A") +
+    "%0A🎟️ Vagas: " + qtd +
+    "%0A💰 Valor: R$ " + (qtd * 15).toFixed(2);
 
-  document.getElementById("btnWhats").onclick = () => {
-    window.open(
-      "https://wa.me/5566996926174?text=" + msg,
-      "_blank"
-    );
+  document.getElementById("btnWpp").onclick = () => {
+    window.open("https://wa.me/5566996926174?text=" + msg);
   };
 }
 </script>
