@@ -11,76 +11,23 @@
 body{margin:0;background:#0b0b0b;font-family:Poppins,sans-serif;color:#fff}
 .container{max-width:480px;margin:auto;padding:15px}
 .card{background:#141414;border-radius:22px;padding:18px;box-shadow:0 0 25px rgba(0,0,0,.7)}
-
 .banner img{width:100%;border-radius:18px;margin-bottom:15px}
-
 .titulo{text-align:center;font-size:22px;font-weight:700}
 .descricao{font-size:14px;color:#ddd;line-height:1.6;margin:10px 0}
-
 .box-info{background:#1f1f1f;padding:12px;border-radius:14px;margin-bottom:15px;font-size:14px}
-
 label{margin-top:12px;display:block;font-weight:600}
 select,input{width:100%;padding:14px;border-radius:14px;border:none;background:#2a2a2a;color:#fff}
-
 .contador{display:flex;justify-content:space-between;align-items:center}
 .contador button{width:46px;height:46px;border:none;border-radius:14px;background:#333;color:#fff;font-size:22px}
-
 .info{text-align:center;margin-top:10px;font-size:14px}
-
-.barra{
-  height:14px;
-  background:#333;
-  border-radius:20px;
-  overflow:hidden;
-  margin-top:10px;
-}
-.progresso{
-  height:100%;
-  background:linear-gradient(90deg,#00ff9c,#00c96b);
-  width:100%;
-  transition:.4s;
-}
-
-.alerta{
-  margin-top:10px;
-  text-align:center;
-  font-weight:700;
-  color:#ffcc00;
-  display:none;
-  animation:piscando 1s infinite;
-}
-@keyframes piscando{
-  0%{opacity:1}
-  50%{opacity:.3}
-  100%{opacity:1}
-}
-
-.total{font-size:24px;font-weight:700;text-align:center;margin-top:10px;color:#00ff9c}
-
-.btn{
-  width:100%;
-  margin-top:14px;
-  padding:18px;
-  border-radius:50px;
-  border:none;
-  font-size:18px;
-  font-weight:700;
-  color:#fff;
-  cursor:pointer;
-}
-
+.barra{height:14px;background:#333;border-radius:20px;overflow:hidden;margin-top:10px}
+.progresso{height:100%;background:linear-gradient(90deg,#00ff9c,#00c96b);transition:.4s}
+.alerta{text-align:center;color:#ffcc00;font-weight:700;display:none}
+.total{text-align:center;font-size:24px;font-weight:700;color:#00ff9c}
+.btn{width:100%;margin-top:14px;padding:18px;border-radius:50px;border:none;font-size:18px;font-weight:700;color:#fff;cursor:pointer}
 .pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
 .whats{background:linear-gradient(135deg,#25d366,#1ebd5c);display:none}
-
-.esgotado{
-  margin-top:10px;
-  background:#550000;
-  padding:12px;
-  border-radius:14px;
-  text-align:center;
-  font-weight:700;
-  display:none;
-}
+.esgotado{background:#550000;padding:12px;border-radius:14px;text-align:center;display:none}
 </style>
 
 <script>
@@ -88,32 +35,40 @@ const PIX = "trilheiros.roomt@gmail.com";
 const LINK_CARTAO = "https://mpago.li/1Hafude";
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxFuu5T6hXRvL_mSEo9a69lb5_Lb4qc7Fez0p8MEJeIHQf0laVtr8gdnUgJrBsZ5xf/exec";
 
-// 🔹 VAGAS FIXAS
-let vagasOnibus = localStorage.getItem("vagasOnibus") !== null ? parseInt(localStorage.getItem("vagasOnibus")) : 44;
-let vagasCarro  = localStorage.getItem("vagasCarro")  !== null ? parseInt(localStorage.getItem("vagasCarro"))  : 36;
+// 🔒 Inicialização correta
+let vagasOnibus = localStorage.getItem("vagasOnibus");
+let vagasCarro  = localStorage.getItem("vagasCarro");
+
+if(vagasOnibus === null || vagasCarro === null){
+  vagasOnibus = 44;
+  vagasCarro = 36;
+  localStorage.setItem("vagasOnibus", 44);
+  localStorage.setItem("vagasCarro", 36);
+}else{
+  vagasOnibus = parseInt(vagasOnibus);
+  vagasCarro = parseInt(vagasCarro);
+}
 
 let qtd = 1;
 
 function atualizar(){
-  const totalGeral = vagasOnibus + vagasCarro;
-  const percentual = (totalGeral / 80) * 100;
-
-  document.getElementById("barra").style.width = percentual + "%";
+  const total = vagasOnibus + vagasCarro;
+  document.getElementById("barra").style.width = (total/80*100) + "%";
 
   infoVagas.innerHTML = `
-    🎟️ <b>Total:</b> ${totalGeral} / 80<br>
+    🎟️ Total: ${total} / 80<br>
     🚌 Ônibus: ${vagasOnibus}<br>
     🚗 Carro próprio: ${vagasCarro}
   `;
 
-  total.innerText = "💰 Total: R$ " + ((tipoTransporte.value === "onibus" ? 85 : 25) * qtd);
+  totalValor.innerText = "💰 Total: R$ " + ((tipoTransporte.value==="onibus"?85:25) * qtd);
 
-  alerta.style.display = totalGeral <= 5 && totalGeral > 0 ? "block" : "none";
+  alerta.style.display = total <= 5 && total > 0 ? "block" : "none";
 
-  if(totalGeral <= 0){
-    esgotado.style.display = "block";
+  if(total <= 0){
     btnReservar.style.display = "none";
     btnWhats.style.display = "none";
+    esgotado.style.display = "block";
   }
 }
 
@@ -133,11 +88,8 @@ function reservar(){
   if(tipo==="onibus" && pagamento==="cartao" && qtd>1)
     return alert("Para mais de uma vaga no cartão, fale com o Jonatas.");
 
-  if(tipo==="onibus" && qtd>vagasOnibus)
-    return alert("Vagas insuficientes no ônibus.");
-
-  if(tipo==="carro" && qtd>vagasCarro)
-    return alert("Vagas insuficientes no carro.");
+  if(tipo==="onibus" && qtd>vagasOnibus) return alert("Sem vagas no ônibus.");
+  if(tipo==="carro" && qtd>vagasCarro) return alert("Sem vagas no carro.");
 
   if(tipo==="onibus") vagasOnibus -= qtd;
   else vagasCarro -= qtd;
@@ -145,12 +97,10 @@ function reservar(){
   localStorage.setItem("vagasOnibus",vagasOnibus);
   localStorage.setItem("vagasCarro",vagasCarro);
 
-  if(pagamento === "pix"){
+  if(pagamento==="pix"){
     navigator.clipboard.writeText(PIX);
-    alert("PIX copiado! Envie o comprovante.");
-  }
-
-  if(pagamento === "cartao"){
+    alert("PIX copiado!");
+  }else{
     window.open(LINK_CARTAO,"_blank");
   }
 
@@ -158,7 +108,7 @@ function reservar(){
     method:"POST",
     body:JSON.stringify({
       nome:nome,
-      transporte: tipo==="onibus" ? "Ônibus" : "Carro",
+      transporte: tipo,
       quantidade:qtd,
       pagamento:pagamento,
       valor:(tipo==="onibus"?85:25)*qtd
@@ -170,18 +120,11 @@ function reservar(){
 }
 
 function enviarWhats(){
-  const nome=document.getElementById("nome").value;
-  const tipo=tipoTransporte.value==="onibus"?"Ônibus":"Carro próprio";
-  const valor=(tipo==="Ônibus"?85:25)*qtd;
+  const nome = document.getElementById("nome").value;
+  const tipo = tipoTransporte.value;
+  const valor = (tipo==="onibus"?85:25)*qtd;
 
-  const msg=`Olá! 👋
-Segue o comprovante da *Trilha do Morro da Mesa* 🌄
-
-👤 Nome: ${nome}
-🚶 Modalidade: ${tipo}
-👥 Vagas: ${qtd}
-💰 Valor: R$ ${valor}`;
-
+  const msg = `Olá! 👋\nNome: ${nome}\nTransporte: ${tipo}\nVagas: ${qtd}\nValor: R$ ${valor}`;
   window.open("https://wa.me/5566996926174?text="+encodeURIComponent(msg));
 }
 </script>
@@ -199,7 +142,7 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 
 <div class="descricao">
 📅 22 de fevereiro • ⏰ 02h<br>
-👣 4 km • ⚠️ Nível médio/difícil
+👣 4 km • ⚠️ Nível médio
 </div>
 
 <div class="box-info">
@@ -208,7 +151,7 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 ✅ Seguro incluso
 </div>
 
-<label>Nome completo</label>
+<label>Nome</label>
 <input id="nome">
 
 <label>Transporte</label>
@@ -228,7 +171,7 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 
 <div id="infoVagas" class="info"></div>
 <div id="alerta" class="alerta">⚠️ ÚLTIMAS VAGAS!</div>
-<div id="total" class="total"></div>
+<div id="totalValor" class="total"></div>
 
 <label>Pagamento</label>
 <select id="formaPagamento">
@@ -248,5 +191,3 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 <script>atualizar();</script>
 </body>
 </html>
-
-
