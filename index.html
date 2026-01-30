@@ -56,31 +56,29 @@ select,input{
   font-size:24px;
 }
 
-/* TOTAL */
-.total{
+/* INFO */
+.info{
+  margin-top:10px;
+  font-size:15px;
   text-align:center;
-  font-size:22px;
-  font-weight:900;
-  margin-top:12px;
+  color:#ccc;
 }
 
-/* AVISOS */
+/* VALOR */
+.total{
+  font-size:22px;
+  font-weight:900;
+  text-align:center;
+  margin-top:10px;
+}
+
+/* AVISO */
 .aviso{
   display:none;
   margin-top:12px;
   padding:12px;
-  background:#3b2a00;
+  background:#2b1f00;
   color:#ffcc00;
-  border-radius:14px;
-  text-align:center;
-  font-weight:bold;
-}
-.esgotado{
-  display:none;
-  margin-top:12px;
-  padding:14px;
-  background:#4a0000;
-  color:#fff;
   border-radius:14px;
   text-align:center;
   font-weight:bold;
@@ -99,15 +97,31 @@ select,input{
   cursor:pointer;
 }
 .pix{background:#32c500;}
+.cartao{background:#1e88e5;}
 .whats{background:#25d366; display:none;}
+
+.esgotado{
+  background:#550000;
+  padding:14px;
+  border-radius:14px;
+  text-align:center;
+  margin-top:12px;
+  font-weight:bold;
+  display:none;
+}
 </style>
 
 <script>
 const PIX = "trilheiros.roomt@gmail.com";
 
-// VAGAS
-let vagasOnibus = 44;
-let vagasCarro = 36;
+// VAGAS REAIS
+let vagasOnibus = localStorage.getItem("vagasOnibus") 
+  ? parseInt(localStorage.getItem("vagasOnibus")) 
+  : 44;
+
+let vagasCarro = localStorage.getItem("vagasCarro") 
+  ? parseInt(localStorage.getItem("vagasCarro")) 
+  : 36;
 
 let qtd = 1;
 
@@ -115,22 +129,19 @@ function atualizar(){
   const tipo = tipoTransporte.value;
   let valor = tipo === "onibus" ? 80 : 35;
 
-  // atualizar total
-  total.innerText = "Total: R$ " + (valor * qtd);
+  total.innerText = "💰 Total: R$ " + (valor * qtd);
 
-  // mostrar vagas restantes
   if(tipo === "onibus"){
     infoVagas.innerText = "🚌 Vagas restantes no ônibus: " + vagasOnibus;
-  }else{
-    infoVagas.innerText = "🚗 Vagas restantes com carro próprio: " + vagasCarro;
+  } else {
+    infoVagas.innerText = "🚗 Vagas restantes (carro próprio): " + vagasCarro;
   }
 
-  // bloquear se zerar
-  if((tipo === "onibus" && vagasOnibus === 0) ||
-     (tipo === "carro" && vagasCarro === 0)){
+  if((tipo === "onibus" && vagasOnibus <= 0) ||
+     (tipo === "carro" && vagasCarro <= 0)){
     esgotado.style.display = "block";
     btnReservar.disabled = true;
-  }else{
+  } else {
     esgotado.style.display = "none";
     btnReservar.disabled = false;
   }
@@ -152,45 +163,64 @@ function menos(){
 
 function reservar(){
   const tipo = tipoTransporte.value;
+  const pagamento = formaPagamento.value;
+
+  if(tipo === "carro" && pagamento === "cartao"){
+    alert("Para carro próprio o pagamento é somente via PIX.");
+    return;
+  }
+
+  if(tipo === "onibus" && pagamento === "cartao" && qtd > 1){
+    alert("Para mais de uma vaga no cartão, fale com o Jonatas.");
+    return;
+  }
 
   if(tipo === "onibus" && qtd > vagasOnibus){
-    alert("Quantidade maior que as vagas disponíveis no ônibus.");
+    alert("Vagas insuficientes no ônibus.");
     return;
   }
 
   if(tipo === "carro" && qtd > vagasCarro){
-    alert("Quantidade maior que as vagas disponíveis para carro próprio.");
+    alert("Vagas insuficientes para carro próprio.");
     return;
   }
 
-  // desconta vagas
   if(tipo === "onibus"){
     vagasOnibus -= qtd;
-  }else{
+    localStorage.setItem("vagasOnibus", vagasOnibus);
+  } else {
     vagasCarro -= qtd;
+    localStorage.setItem("vagasCarro", vagasCarro);
   }
 
-  navigator.clipboard.writeText(PIX);
-  alert("PIX copiado! Faça o pagamento e envie o comprovante.");
+  if(pagamento === "pix"){
+    navigator.clipboard.writeText(PIX);
+    alert("PIX copiado! Faça o pagamento e envie o comprovante.");
+  }
 
+  aviso.style.display = "block";
   btnWhats.style.display = "block";
   atualizar();
 }
 
 function enviarWhats(){
+  const nome = document.getElementById("nome").value;
+  const tipo = tipoTransporte.value === "onibus" ? "Ônibus" : "Carro próprio";
+  const valor = tipo === "Ônibus" ? 80 : 35;
+  const total = valor * qtd;
+
   const msg =
-`Olá, gostaria de confirmar minha vaga na Trilha do Morro da Mesa.
+`Olá! 👋
+Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 
-Tipo: ${tipoTransporte.value === "onibus" ? "Ônibus" : "Carro próprio"}
-Quantidade: ${qtd}
-Pagamento: PIX
+👤 Nome: ${nome}
+🚶 Modalidade: ${tipo}
+👥 Vagas: ${qtd}
+💰 Valor total: R$ ${total}
 
-Segue comprovante.`;
+Aguardo confirmação da vaga.`;
 
-  window.open(
-    "https://wa.me/5566996926174?text=" + encodeURIComponent(msg),
-    "_blank"
-  );
+  window.open("https://wa.me/5566996926174?text=" + encodeURIComponent(msg));
 }
 </script>
 </head>
@@ -209,8 +239,8 @@ Segue comprovante.`;
 
 <label>Tipo de transporte</label>
 <select id="tipoTransporte" onchange="atualizar()">
-  <option value="onibus">🚌 Ônibus (44 vagas)</option>
-  <option value="carro">🚗 Carro próprio (36 vagas)</option>
+  <option value="onibus">🚌 Ônibus</option>
+  <option value="carro">🚗 Carro próprio</option>
 </select>
 
 <label>Quantidade de vagas</label>
@@ -220,16 +250,25 @@ Segue comprovante.`;
   <button onclick="mais()">+</button>
 </div>
 
-<div id="infoVagas" class="aviso"></div>
+<div id="infoVagas" class="info"></div>
+<div id="total" class="total"></div>
 
-<div id="total" class="total">Total: R$ 80</div>
+<label>Forma de pagamento</label>
+<select id="formaPagamento">
+  <option value="pix">💚 PIX</option>
+  <option value="cartao">💳 Cartão (somente ônibus)</option>
+</select>
+
+<div id="aviso" class="aviso">
+📢 Após o pagamento, clique abaixo e envie o comprovante para garantir sua vaga.
+</div>
 
 <button id="btnReservar" class="btn pix" onclick="reservar()">
-RESERVAR VAGA
+CONFIRMAR PAGAMENTO
 </button>
 
 <div id="esgotado" class="esgotado">
-❌ Vagas esgotadas para esta opção.
+❌ VAGAS ESGOTADAS
 </div>
 
 <button id="btnWhats" class="btn whats" onclick="enviarWhats()">
@@ -242,4 +281,5 @@ ENVIAR COMPROVANTE
 <script>atualizar();</script>
 </body>
 </html>
+
 
