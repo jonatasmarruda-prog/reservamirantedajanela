@@ -1,204 +1,245 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Trilha Mirante da Janela</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<title>Morro da Mesa</title>
 
 <style>
 body{
   margin:0;
-  background:linear-gradient(180deg,#0f2027,#203a43,#2c5364);
-  font-family:Arial;
+  background:#111;
+  font-family:Arial,sans-serif;
   color:#fff;
 }
-.container{max-width:420px;margin:auto;padding:15px}
-.banner{width:100%;border-radius:15px;margin-bottom:15px}
-.card{background:#111;border-radius:18px;padding:20px}
-h1{text-align:center;color:#00ffd5}
-.info{text-align:center}
-.vagas{text-align:center;color:#00ffcc;font-weight:bold}
-textarea,input,select{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:none;
-  margin-top:10px;
+.container{
+  max-width:480px;
+  margin:auto;
+  padding:15px;
 }
-label{
-  font-size:14px;
-  color:#9be7ff;
-  margin-top:8px;
-  display:block;
-}
-button{
-  width:100%;
+.card{
+  background:#1c1c1c;
+  border-radius:22px;
   padding:16px;
-  border-radius:40px;
-  border:none;
-  font-size:18px;
-  font-weight:bold;
-  margin-top:12px;
-  cursor:pointer;
 }
-.btn{background:linear-gradient(180deg,#2e9cff,#0066ff);color:#fff}
-.btn-wpp{background:linear-gradient(180deg,#25d366,#128c7e)}
-</style>
-</head>
+.banner img{
+  width:100%;
+  border-radius:18px;
+  margin-bottom:15px;
+}
 
-<body>
+/* FORM */
+label{margin-top:12px;display:block;font-weight:bold}
+select,input{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  background:#2a2a2a;
+  color:#fff;
+  font-size:16px;
+}
 
-<div class="container">
+/* CONTADOR */
+.contador{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.contador button{
+  width:46px;
+  height:46px;
+  border:none;
+  border-radius:14px;
+  background:#2a2a2a;
+  color:#fff;
+  font-size:24px;
+}
 
-<img class="banner" src="https://i.postimg.cc/wvfkLJcn/Post-para-instagram-dia-do-turismo-divertido-amarelo-laranja.png">
+/* TOTAL */
+.total{
+  text-align:center;
+  font-size:22px;
+  font-weight:900;
+  margin-top:12px;
+}
 
-<div class="card">
-
-<h1>🌄 Trilha Mirante da Janela</h1>
-<p class="info">📅 25 de Janeiro • ⏰ 4h</p>
-<p class="info">💰 R$ 15,00 por pessoa</p>
-
-<p class="vagas">🎟️ Vagas restantes: <span id="vagas">...</span></p>
-
-<div style="margin-top:10px;background:#0f2f3a;padding:10px;border-radius:10px;text-align:center">
-Selecione a quantidade de vagas:
-</div>
-
-<select id="qtd" onchange="gerarCampos(); atualizarTotal();">
-  <option value="1">1 vaga</option>
-  <option value="2">2 vagas</option>
-  <option value="3">3 vagas</option>
-  <option value="4">4 vagas</option>
-  <option value="5">5 vagas</option>
-  <option value="6">6 vagas</option>
-  <option value="7">7 vagas</option>
-  <option value="8">8 vagas</option>
-  <option value="9">9 vagas</option>
-  <option value="10">10 vagas</option>
-</select>
-
-<div id="camposNomes"></div>
-
-<p id="totalValor" style="text-align:center;color:#00ffd5;font-weight:bold">
-💰 Total: R$ 15,00
-</p>
-
-<button id="btnPix" class="btn" onclick="confirmar()">
-📋 COPIAR PIX • GARANTIR VAGA
-</button>
-
-<div id="msgPix" style="
+/* AVISOS */
+.aviso{
   display:none;
   margin-top:12px;
   padding:12px;
-  background:#0f2f3a;
-  border-radius:10px;
+  background:#3b2a00;
+  color:#ffcc00;
+  border-radius:14px;
   text-align:center;
-  color:#00ffcc;
-  font-weight:bold;">
-  ✅ Pix copiado com sucesso!<br>
-  📲 Agora envie o comprovante.
-</div>
+  font-weight:bold;
+}
+.esgotado{
+  display:none;
+  margin-top:12px;
+  padding:14px;
+  background:#4a0000;
+  color:#fff;
+  border-radius:14px;
+  text-align:center;
+  font-weight:bold;
+}
 
-<div id="final" style="display:none;text-align:center;margin-top:15px">
-  <button id="btnWpp" class="btn btn-wpp">📲 ENVIAR COMPROVANTE</button>
-</div>
-
-</div>
-</div>
+/* BOTÕES */
+.btn{
+  width:100%;
+  margin-top:14px;
+  padding:18px;
+  border-radius:40px;
+  border:none;
+  font-size:18px;
+  font-weight:900;
+  color:#fff;
+  cursor:pointer;
+}
+.pix{background:#32c500;}
+.whats{background:#25d366; display:none;}
+</style>
 
 <script>
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "trilha-mirante.firebaseapp.com",
-  databaseURL: "https://trilha-mirante-default-rtdb.firebaseio.com",
-  projectId: "trilha-mirante",
-  storageBucket: "trilha-mirante.appspot.com",
-  messagingSenderId: "SEU_ID",
-  appId: "SEU_APP_ID"
-};
+const PIX = "trilheiros.roomt@gmail.com";
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const vagasRef = db.ref("vagas/total");
+// VAGAS
+let vagasOnibus = 44;
+let vagasCarro = 36;
 
-// Atualiza vagas
-vagasRef.on("value", snap => {
-  const v = snap.val();
-  document.getElementById("vagas").innerText = v;
-  if (v <= 0) {
-    document.getElementById("btnPix").disabled = true;
-    document.getElementById("btnPix").innerText = "🚫 VAGAS ESGOTADAS";
+let qtd = 1;
+
+function atualizar(){
+  const tipo = tipoTransporte.value;
+  let valor = tipo === "onibus" ? 80 : 35;
+
+  // atualizar total
+  total.innerText = "Total: R$ " + (valor * qtd);
+
+  // mostrar vagas restantes
+  if(tipo === "onibus"){
+    infoVagas.innerText = "🚌 Vagas restantes no ônibus: " + vagasOnibus;
+  }else{
+    infoVagas.innerText = "🚗 Vagas restantes com carro próprio: " + vagasCarro;
   }
-});
 
-// Cria campos
-function gerarCampos() {
-  const qtd = parseInt(document.getElementById("qtd").value);
-  const div = document.getElementById("camposNomes");
-  div.innerHTML = "";
-
-  for (let i = 1; i <= qtd; i++) {
-    div.innerHTML += `
-      <label>Nome do participante ${i}</label>
-      <input type="text" class="nomePessoa" placeholder="Digite o nome do participante ${i}" required>
-    `;
+  // bloquear se zerar
+  if((tipo === "onibus" && vagasOnibus === 0) ||
+     (tipo === "carro" && vagasCarro === 0)){
+    esgotado.style.display = "block";
+    btnReservar.disabled = true;
+  }else{
+    esgotado.style.display = "none";
+    btnReservar.disabled = false;
   }
 }
 
-// Atualiza valor
-function atualizarTotal() {
-  const qtd = parseInt(document.getElementById("qtd").value);
-  document.getElementById("totalValor").innerText =
-    "💰 Total: R$ " + (qtd * 15).toFixed(2).replace(".", ",");
+function mais(){
+  qtd++;
+  quantidade.innerText = qtd;
+  atualizar();
 }
 
-// Confirma
-function confirmar() {
-  const nomesInputs = document.querySelectorAll(".nomePessoa");
-  let nomes = "";
+function menos(){
+  if(qtd > 1){
+    qtd--;
+    quantidade.innerText = qtd;
+    atualizar();
+  }
+}
 
-  for (let i = 0; i < nomesInputs.length; i++) {
-    if (!nomesInputs[i].value.trim()) {
-      alert("Preencha todos os nomes.");
-      return;
-    }
-    nomes += "- " + nomesInputs[i].value + "\n";
+function reservar(){
+  const tipo = tipoTransporte.value;
+
+  if(tipo === "onibus" && qtd > vagasOnibus){
+    alert("Quantidade maior que as vagas disponíveis no ônibus.");
+    return;
   }
 
-  const qtd = nomesInputs.length;
+  if(tipo === "carro" && qtd > vagasCarro){
+    alert("Quantidade maior que as vagas disponíveis para carro próprio.");
+    return;
+  }
 
-  vagasRef.transaction(v => v >= qtd ? v - qtd : v);
+  // desconta vagas
+  if(tipo === "onibus"){
+    vagasOnibus -= qtd;
+  }else{
+    vagasCarro -= qtd;
+  }
 
-  navigator.clipboard.writeText("trilheiros.roomt@gmail.com");
+  navigator.clipboard.writeText(PIX);
+  alert("PIX copiado! Faça o pagamento e envie o comprovante.");
 
-  document.getElementById("msgPix").style.display = "block";
-  document.getElementById("final").style.display = "block";
-
-  const mensagem = `
-Olá! 😊
-Confirmação da Trilha Mirante da Janela 🌄
-
-👥 Participantes:
-${nomes}
-
-🎟️ Vagas: ${qtd}
-💰 Valor: R$ ${(qtd * 15).toFixed(2)}
-`;
-
-  const texto = encodeURIComponent(mensagem);
-
-  document.getElementById("btnWpp").onclick = () => {
-    window.open("https://wa.me/5566996926174?text=" + texto);
-  };
+  btnWhats.style.display = "block";
+  atualizar();
 }
 
-// inicia com 1 campo
-gerarCampos();
+function enviarWhats(){
+  const msg =
+`Olá, gostaria de confirmar minha vaga na Trilha do Morro da Mesa.
+
+Tipo: ${tipoTransporte.value === "onibus" ? "Ônibus" : "Carro próprio"}
+Quantidade: ${qtd}
+Pagamento: PIX
+
+Segue comprovante.`;
+
+  window.open(
+    "https://wa.me/5566996926174?text=" + encodeURIComponent(msg),
+    "_blank"
+  );
+}
 </script>
+</head>
 
+<body>
+<div class="container">
+
+<div class="card">
+
+<div class="banner">
+  <img src="https://i.postimg.cc/FzLnkVc2/Orange-and-Black-Modern-Mountain-Bike-Event-Instagram-Post.png">
+</div>
+
+<label>Nome completo</label>
+<input id="nome">
+
+<label>Tipo de transporte</label>
+<select id="tipoTransporte" onchange="atualizar()">
+  <option value="onibus">🚌 Ônibus (44 vagas)</option>
+  <option value="carro">🚗 Carro próprio (36 vagas)</option>
+</select>
+
+<label>Quantidade de vagas</label>
+<div class="contador">
+  <button onclick="menos()">−</button>
+  <span id="quantidade">1</span>
+  <button onclick="mais()">+</button>
+</div>
+
+<div id="infoVagas" class="aviso"></div>
+
+<div id="total" class="total">Total: R$ 80</div>
+
+<button id="btnReservar" class="btn pix" onclick="reservar()">
+RESERVAR VAGA
+</button>
+
+<div id="esgotado" class="esgotado">
+❌ Vagas esgotadas para esta opção.
+</div>
+
+<button id="btnWhats" class="btn whats" onclick="enviarWhats()">
+ENVIAR COMPROVANTE
+</button>
+
+</div>
+</div>
+
+<script>atualizar();</script>
 </body>
 </html>
+
