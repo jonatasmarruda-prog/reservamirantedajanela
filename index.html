@@ -17,14 +17,11 @@ body{margin:0;background:#0b0b0b;font-family:Poppins,sans-serif;color:#fff}
 .box-info{background:#1f1f1f;padding:12px;border-radius:14px;margin-bottom:15px}
 label{display:block;margin-top:10px;font-weight:600}
 input,select{width:100%;padding:14px;border-radius:14px;border:none;background:#2a2a2a;color:#fff}
-
 .contador{display:flex;justify-content:space-between;align-items:center}
 .contador button{width:45px;height:45px;border:none;border-radius:12px;background:#333;color:#fff;font-size:22px}
-
 .info{text-align:center;margin-top:10px}
 .alerta{color:#ffcc00;font-weight:bold;text-align:center;display:none}
 .esgotado{background:#550000;padding:12px;border-radius:12px;text-align:center;display:none}
-
 .btn{width:100%;margin-top:14px;padding:18px;border-radius:50px;border:none;font-size:18px;font-weight:700;color:#fff}
 .pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
 .whats{background:linear-gradient(135deg,#25d366,#1ebd5c);display:none}
@@ -33,9 +30,14 @@ input,select{width:100%;padding:14px;border-radius:14px;border:none;background:#
 <script>
 const PIX = "trilheiros.roomt@gmail.com";
 const LINK_CARTAO = "https://mpago.li/1Hafude";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxFuu5T6hXRvL_mSEo9a69lb5_Lb4qc7Fez0p8MEJeIHQf0laVtr8gdnUgJrBsZ5xf/exec";
 
-let vagasOnibus = localStorage.getItem("vagasOnibus") ?? 44;
-let vagasCarro  = localStorage.getItem("vagasCarro") ?? 36;
+// VAGAS FIXAS
+let vagasOnibus = localStorage.getItem("vagasOnibus");
+let vagasCarro  = localStorage.getItem("vagasCarro");
+
+if(vagasOnibus === null){ vagasOnibus = 44; localStorage.setItem("vagasOnibus",44); }
+if(vagasCarro === null){ vagasCarro = 36; localStorage.setItem("vagasCarro",36); }
 
 vagasOnibus = parseInt(vagasOnibus);
 vagasCarro = parseInt(vagasCarro);
@@ -48,18 +50,18 @@ function atualizar(){
     🚗 Vagas carro próprio: <b>${vagasCarro}</b>
   `;
 
-  if(vagasOnibus <= 0 && tipoTransporte.value === "onibus"){
-    esgotado.style.display = "block";
-    btnReservar.style.display = "none";
-  }else if(vagasCarro <= 0 && tipoTransporte.value === "carro"){
-    esgotado.style.display = "block";
-    btnReservar.style.display = "none";
-  }else{
-    esgotado.style.display = "none";
-    btnReservar.style.display = "block";
-  }
+  total.innerText = "💰 Total: R$ " + ((tipoTransporte.value==="onibus"?85:25)*qtd);
 
-  total.innerText = "💰 Total: R$ " + ((tipoTransporte.value==="onibus"?85:25) * qtd);
+  if(
+    (tipoTransporte.value==="onibus" && vagasOnibus<=0) ||
+    (tipoTransporte.value==="carro" && vagasCarro<=0)
+  ){
+    btnReservar.style.display="none";
+    esgotado.style.display="block";
+  }else{
+    btnReservar.style.display="block";
+    esgotado.style.display="none";
+  }
 }
 
 function mais(){qtd++;quantidade.innerText=qtd;atualizar();}
@@ -72,11 +74,11 @@ function reservar(){
 
   if(!nome) return alert("Digite seu nome.");
 
-  if(tipo==="onibus" && qtd > vagasOnibus)
-    return alert("Não há vagas suficientes no ônibus.");
+  if(tipo==="onibus" && qtd>vagasOnibus)
+    return alert("Sem vagas no ônibus.");
 
-  if(tipo==="carro" && qtd > vagasCarro)
-    return alert("Não há vagas suficientes no carro.");
+  if(tipo==="carro" && qtd>vagasCarro)
+    return alert("Sem vagas no carro.");
 
   if(tipo==="carro" && pagamento==="cartao")
     return alert("Carro próprio aceita apenas PIX.");
@@ -90,10 +92,21 @@ function reservar(){
   localStorage.setItem("vagasOnibus",vagasOnibus);
   localStorage.setItem("vagasCarro",vagasCarro);
 
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      nome:nome,
+      transporte:tipo,
+      quantidade:qtd,
+      pagamento:pagamento,
+      valor:(tipo==="onibus"?85:25)*qtd
+    })
+  });
+
   if(pagamento==="pix"){
     navigator.clipboard.writeText(PIX);
     alert("PIX copiado!");
-  }else{
+  } else {
     window.open(LINK_CARTAO,"_blank");
   }
 
@@ -175,5 +188,3 @@ Valor: R$ ${valor}`;
 <script>atualizar();</script>
 </body>
 </html>
-
-
