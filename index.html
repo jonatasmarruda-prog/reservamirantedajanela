@@ -36,9 +36,9 @@ select,input{width:100%;padding:14px;border-radius:14px;border:none;background:#
 }
 .progresso{
   height:100%;
-  width:100%;
   background:linear-gradient(90deg,#00ff9c,#00c96b);
-  transition:width .5s;
+  width:100%;
+  transition:.4s;
 }
 
 .alerta{
@@ -49,6 +49,7 @@ select,input{width:100%;padding:14px;border-radius:14px;border:none;background:#
   display:none;
   animation:piscando 1s infinite;
 }
+
 @keyframes piscando{
   0%{opacity:1}
   50%{opacity:.3}
@@ -67,7 +68,6 @@ select,input{width:100%;padding:14px;border-radius:14px;border:none;background:#
   font-weight:700;
   color:#fff;
   cursor:pointer;
-  box-shadow:0 0 15px rgba(0,255,150,.7);
 }
 
 .pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
@@ -104,7 +104,7 @@ function atualizar(){
     🚗 Carro próprio: ${vagasCarro}
   `;
 
-  total.innerText = "💰 Total: R$ " + (tipoTransporte.value==="onibus" ? 85 : 25) * qtd;
+  total.innerText = "💰 Total: R$ " + ((tipoTransporte.value==="onibus"?85:25) * qtd);
 
   alerta.style.display = totalGeral <= 5 && totalGeral > 0 ? "block" : "none";
 
@@ -115,24 +115,28 @@ function atualizar(){
   }
 }
 
-function mais(){qtd++;quantidade.innerText=qtd;atualizar()}
-function menos(){if(qtd>1){qtd--;quantidade.innerText=qtd;atualizar()}}
+function mais(){qtd++;quantidade.innerText=qtd;atualizar();}
+function menos(){if(qtd>1){qtd--;quantidade.innerText=qtd;atualizar();}}
 
 function reservar(){
   const nome = document.getElementById("nome").value.trim();
   const tipo = tipoTransporte.value;
   const pagamento = formaPagamento.value;
 
-  if(!nome) return alert("Informe seu nome");
+  if(!nome){alert("Informe seu nome.");return;}
 
-  if(tipo==="carro" && pagamento==="cartao")
-    return alert("Carro próprio aceita apenas PIX.");
+  if(tipo==="carro" && pagamento==="cartao"){
+    alert("Carro próprio aceita apenas PIX.");
+    return;
+  }
 
-  if(tipo==="onibus" && pagamento==="cartao" && qtd>1)
-    return alert("Para mais de uma vaga, fale com o Jonatas.");
+  if(tipo==="onibus" && pagamento==="cartao" && qtd>1){
+    alert("Para mais de uma vaga no cartão, fale com o Jonatas.");
+    return;
+  }
 
-  if(tipo==="onibus" && qtd>vagasOnibus) return;
-  if(tipo==="carro" && qtd>vagasCarro) return;
+  if(tipo==="onibus" && qtd>vagasOnibus) return alert("Vagas insuficientes no ônibus.");
+  if(tipo==="carro" && qtd>vagasCarro) return alert("Vagas insuficientes no carro.");
 
   if(tipo==="onibus") vagasOnibus -= qtd;
   else vagasCarro -= qtd;
@@ -187,13 +191,12 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 </div>
 
 <div class="box-info">
-☕ Levar café<br>
-♻️ Levar lixo<br>
+☕ Levar café • ♻️ Levar lixo<br>
 🚫 Não indicado para iniciantes<br>
 ✅ Seguro incluso
 </div>
 
-<label>Nome</label>
+<label>Nome completo</label>
 <input id="nome">
 
 <label>Transporte</label>
@@ -209,9 +212,7 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 <button onclick="mais()">+</button>
 </div>
 
-<div class="barra">
-  <div id="barra" class="progresso"></div>
-</div>
+<div class="barra"><div id="barra" class="progresso"></div></div>
 
 <div id="infoVagas" class="info"></div>
 <div id="alerta" class="alerta">⚠️ ÚLTIMAS VAGAS!</div>
@@ -235,4 +236,3 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 <script>atualizar();</script>
 </body>
 </html>
-
