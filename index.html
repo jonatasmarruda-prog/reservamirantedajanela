@@ -11,6 +11,7 @@
 body{margin:0;background:#0b0b0b;font-family:Poppins,sans-serif;color:#fff}
 .container{max-width:480px;margin:auto;padding:15px}
 .card{background:#141414;border-radius:22px;padding:18px;box-shadow:0 0 25px rgba(0,0,0,.7)}
+
 .banner img{width:100%;border-radius:18px;margin-bottom:15px}
 
 .titulo{text-align:center;font-size:22px;font-weight:700}
@@ -24,7 +25,36 @@ select,input{width:100%;padding:14px;border-radius:14px;border:none;background:#
 .contador{display:flex;justify-content:space-between;align-items:center}
 .contador button{width:46px;height:46px;border:none;border-radius:14px;background:#333;color:#fff;font-size:22px}
 
-.info{text-align:center;margin-top:10px;color:#ccc;font-size:14px}
+.info{text-align:center;margin-top:10px;font-size:14px}
+
+.barra{
+  height:14px;
+  background:#333;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
+}
+.progresso{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,#00ff9c,#00c96b);
+  transition:width .5s;
+}
+
+.alerta{
+  margin-top:10px;
+  text-align:center;
+  font-weight:700;
+  color:#ffcc00;
+  display:none;
+  animation:piscando 1s infinite;
+}
+@keyframes piscando{
+  0%{opacity:1}
+  50%{opacity:.3}
+  100%{opacity:1}
+}
+
 .total{font-size:24px;font-weight:700;text-align:center;margin-top:10px;color:#00ff9c}
 
 .btn{
@@ -38,23 +68,19 @@ select,input{width:100%;padding:14px;border-radius:14px;border:none;background:#
   color:#fff;
   cursor:pointer;
   box-shadow:0 0 15px rgba(0,255,150,.7);
-  transition:.2s;
 }
-.btn:hover{transform:scale(1.03)}
 
 .pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
 .whats{background:linear-gradient(135deg,#25d366,#1ebd5c);display:none}
 
-.alerta{margin-top:10px;text-align:center;color:#ffcc00;font-weight:600;display:none}
-.esgotado{margin-top:10px;background:#550000;padding:12px;border-radius:14px;text-align:center;display:none}
-
-.pulse{
-  animation:pulse .6s ease;
-}
-@keyframes pulse{
-  0%{transform:scale(1)}
-  50%{transform:scale(1.05)}
-  100%{transform:scale(1)}
+.esgotado{
+  margin-top:10px;
+  background:#550000;
+  padding:12px;
+  border-radius:14px;
+  text-align:center;
+  font-weight:700;
+  display:none;
 }
 </style>
 
@@ -67,23 +93,20 @@ let vagasCarro  = localStorage.getItem("vagasCarro")  ? parseInt(localStorage.ge
 let qtd = 1;
 
 function atualizar(){
-  const tipo = tipoTransporte.value;
-  const valor = tipo === "onibus" ? 85 : 25;
-
-  total.innerText = "💰 Total: R$ " + (valor * qtd);
-
   const totalGeral = vagasOnibus + vagasCarro;
+  const percentual = (totalGeral / 80) * 100;
+
+  document.getElementById("barra").style.width = percentual + "%";
 
   infoVagas.innerHTML = `
-  🧮 <b>Total de vagas:</b> ${totalGeral} / 80<br>
-  🚌 Ônibus: ${vagasOnibus} / 44<br>
-  🚗 Carro próprio: ${vagasCarro} / 36
+    🎟️ <b>Total:</b> ${totalGeral} / 80<br>
+    🚌 Ônibus: ${vagasOnibus}<br>
+    🚗 Carro próprio: ${vagasCarro}
   `;
 
-  infoVagas.classList.add("pulse");
-  setTimeout(()=>infoVagas.classList.remove("pulse"),300);
+  total.innerText = "💰 Total: R$ " + (tipoTransporte.value==="onibus" ? 85 : 25) * qtd;
 
-  alerta.style.display = (totalGeral <= 5 && totalGeral > 0) ? "block" : "none";
+  alerta.style.display = totalGeral <= 5 && totalGeral > 0 ? "block" : "none";
 
   if(totalGeral <= 0){
     esgotado.style.display = "block";
@@ -100,13 +123,13 @@ function reservar(){
   const tipo = tipoTransporte.value;
   const pagamento = formaPagamento.value;
 
-  if(!nome) return alert("Informe seu nome.");
+  if(!nome) return alert("Informe seu nome");
 
   if(tipo==="carro" && pagamento==="cartao")
     return alert("Carro próprio aceita apenas PIX.");
 
   if(tipo==="onibus" && pagamento==="cartao" && qtd>1)
-    return alert("Para mais de uma vaga no cartão, fale com o Jonatas.");
+    return alert("Para mais de uma vaga, fale com o Jonatas.");
 
   if(tipo==="onibus" && qtd>vagasOnibus) return;
   if(tipo==="carro" && qtd>vagasCarro) return;
@@ -126,7 +149,6 @@ function reservar(){
     window.open(LINK_CARTAO,"_blank");
   }
 
-  aviso.style.display="block";
   btnWhats.style.display="block";
   atualizar();
 }
@@ -157,21 +179,21 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 <img src="https://i.postimg.cc/FzLnkVc2/Orange-and-Black-Modern-Mountain-Bike-Event-Instagram-Post.png">
 </div>
 
-<div class="titulo">⛰️ Subida do Morro da Mesa – Poxoréu/MT</div>
+<div class="titulo">⛰️ Subida do Morro da Mesa</div>
 
 <div class="descricao">
-📅 22 de fevereiro • ⏰ Saída às 02h<br>
-👣 4 km • ⚠️ Nível médio a difícil
+📅 22 de fevereiro • ⏰ 02h<br>
+👣 4 km • ⚠️ Nível médio/difícil
 </div>
 
 <div class="box-info">
-☕ Café individual<br>
-♻️ Levar seu lixo<br>
+☕ Levar café<br>
+♻️ Levar lixo<br>
 🚫 Não indicado para iniciantes<br>
 ✅ Seguro incluso
 </div>
 
-<label>Nome completo</label>
+<label>Nome</label>
 <input id="nome">
 
 <label>Transporte</label>
@@ -187,8 +209,12 @@ Segue o comprovante da *Trilha do Morro da Mesa* 🌄
 <button onclick="mais()">+</button>
 </div>
 
+<div class="barra">
+  <div id="barra" class="progresso"></div>
+</div>
+
 <div id="infoVagas" class="info"></div>
-<div id="alerta" class="alerta">⚠️ Últimas vagas disponíveis!</div>
+<div id="alerta" class="alerta">⚠️ ÚLTIMAS VAGAS!</div>
 <div id="total" class="total"></div>
 
 <label>Pagamento</label>
