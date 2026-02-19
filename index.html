@@ -1,190 +1,210 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Morro da Mesa</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confirmação no ônibus – Trilha Morro da Mesa | 22 de fevereiro</title>
+  <style>
+    :root{
+      --ok:#22c55e;
+      --no:#ef4444;
+      --bg:#020617;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 10% 0%, #0f766e 0%, #020617 45%);
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      background: rgba(2,6,23,.9);
+      backdrop-filter: blur(10px);
+      padding:16px 14px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    h1{
+      margin:0 0 8px 0;
+      font-size:1.15rem;
+      line-height:1.3;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:8px;
+      font-size:.9rem;
+      color:var(--muted)
+    }
+    .stat{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      padding:10px 8px;
+      text-align:center;
+    }
+    .stat b{display:block; font-size:1.2rem; color:#fff}
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    main{padding:12px 10px 92px}
 
-<style>
-body{margin:0;background:#0b0b0b;font-family:Poppins,sans-serif;color:#fff}
-.container{max-width:480px;margin:auto;padding:15px}
-.card{background:#141414;border-radius:22px;padding:18px;box-shadow:0 0 25px rgba(0,0,0,.7)}
-.banner img{width:100%;border-radius:18px;margin-bottom:15px}
-.titulo{text-align:center;font-size:22px;font-weight:700}
-.descricao{font-size:14px;color:#ddd;margin:10px 0}
-.box-info{background:#1f1f1f;padding:12px;border-radius:14px;margin-bottom:15px}
-label{display:block;margin-top:10px;font-weight:600}
-input,select{width:100%;padding:14px;border-radius:14px;border:none;background:#2a2a2a;color:#fff}
-.contador{display:flex;justify-content:space-between;align-items:center}
-.contador button{width:45px;height:45px;border:none;border-radius:12px;background:#333;color:#fff;font-size:22px}
-.info{text-align:center;margin-top:10px}
-.alerta{color:#ffcc00;font-weight:bold;text-align:center;display:none}
-.esgotado{background:#550000;padding:12px;border-radius:12px;text-align:center;display:none}
-.btn{width:100%;margin-top:14px;padding:18px;border-radius:50px;border:none;font-size:18px;font-weight:700;color:#fff}
-.pix{background:linear-gradient(135deg,#00ff9c,#00c96b)}
-.whats{background:linear-gradient(135deg,#25d366,#1ebd5c);display:none}
-</style>
+    .list{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
 
-<script>
-const PIX = "trilheiros.roomt@gmail.com";
-const LINK_CARTAO = "https://mpago.li/1Hafude";
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxFuu5T6hXRvL_mSEo9a69lb5_Lb4qc7Fez0p8MEJeIHQf0laVtr8gdnUgJrBsZ5xf/exec";
+    .item{
+      padding:16px 14px;
+      border-radius:16px;
+      border:2px solid transparent;
+      font-weight:900;
+      font-size:1rem;
+      letter-spacing:.02em;
+      box-shadow: 0 12px 24px rgba(0,0,0,.35);
+      transition: transform .1s ease, box-shadow .1s ease, filter .1s ease;
+      user-select:none;
+    }
+    .item:active{
+      transform: scale(.98);
+      filter: brightness(1.05);
+      box-shadow: 0 8px 16px rgba(0,0,0,.4);
+    }
 
-// VAGAS FIXAS
-let vagasOnibus = localStorage.getItem("vagasOnibus");
-let vagasCarro  = localStorage.getItem("vagasCarro");
+    .item.no{
+      background: linear-gradient(180deg, rgba(239,68,68,.35), rgba(239,68,68,.15));
+      border-color: rgba(239,68,68,.7);
+      color:#fee2e2;
+    }
 
-if(vagasOnibus === null){ vagasOnibus = 44; localStorage.setItem("vagasOnibus",44); }
-if(vagasCarro === null){ vagasCarro = 36; localStorage.setItem("vagasCarro",36); }
+    .item.ok{
+      background: linear-gradient(180deg, rgba(34,197,94,.35), rgba(34,197,94,.15));
+      border-color: rgba(34,197,94,.8);
+      color:#dcfce7;
+    }
 
-vagasOnibus = parseInt(vagasOnibus);
-vagasCarro = parseInt(vagasCarro);
-
-let qtd = 1;
-
-function atualizar(){
-  infoVagas.innerHTML = `
-    🚌 Vagas ônibus: <b>${vagasOnibus}</b><br>
-    🚗 Vagas carro próprio: <b>${vagasCarro}</b>
-  `;
-
-  total.innerText = "💰 Total: R$ " + ((tipoTransporte.value==="onibus"?85:25)*qtd);
-
-  if(
-    (tipoTransporte.value==="onibus" && vagasOnibus<=0) ||
-    (tipoTransporte.value==="carro" && vagasCarro<=0)
-  ){
-    btnReservar.style.display="none";
-    esgotado.style.display="block";
-  }else{
-    btnReservar.style.display="block";
-    esgotado.style.display="none";
-  }
-}
-
-function mais(){qtd++;quantidade.innerText=qtd;atualizar();}
-function menos(){if(qtd>1){qtd--;quantidade.innerText=qtd;atualizar();}}
-
-function reservar(){
-  const nome = document.getElementById("nome").value.trim();
-  const tipo = tipoTransporte.value;
-  const pagamento = formaPagamento.value;
-
-  if(!nome) return alert("Digite seu nome.");
-
-  if(tipo==="onibus" && qtd>vagasOnibus)
-    return alert("Sem vagas no ônibus.");
-
-  if(tipo==="carro" && qtd>vagasCarro)
-    return alert("Sem vagas no carro.");
-
-  if(tipo==="carro" && pagamento==="cartao")
-    return alert("Carro próprio aceita apenas PIX.");
-
-  if(tipo==="onibus" && pagamento==="cartao" && qtd>1)
-    return alert("Para mais de uma vaga no cartão, fale com o Jonatas.");
-
-  if(tipo==="onibus") vagasOnibus -= qtd;
-  else vagasCarro -= qtd;
-
-  localStorage.setItem("vagasOnibus",vagasOnibus);
-  localStorage.setItem("vagasCarro",vagasCarro);
-
-  fetch(SCRIPT_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      nome:nome,
-      transporte:tipo,
-      quantidade:qtd,
-      pagamento:pagamento,
-      valor:(tipo==="onibus"?85:25)*qtd
-    })
-  });
-
-  if(pagamento==="pix"){
-    navigator.clipboard.writeText(PIX);
-    alert("PIX copiado!");
-  } else {
-    window.open(LINK_CARTAO,"_blank");
-  }
-
-  btnWhats.style.display="block";
-  atualizar();
-}
-
-function enviarWhats(){
-  const nome=document.getElementById("nome").value;
-  const tipo=tipoTransporte.value;
-  const valor=(tipo==="onibus"?85:25)*qtd;
-
-  const msg=`Olá! 👋
-Nome: ${nome}
-Transporte: ${tipo}
-Vagas: ${qtd}
-Valor: R$ ${valor}`;
-
-  window.open("https://wa.me/5566996926174?text="+encodeURIComponent(msg));
-}
-</script>
+    footer{
+      position:fixed; left:0; right:0; bottom:0;
+      background: rgba(2,6,23,.95);
+      backdrop-filter: blur(10px);
+      border-top:1px solid rgba(255,255,255,.08);
+      padding:10px 10px 12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    button{
+      padding:14px 12px;
+      border-radius:14px;
+      border:none;
+      font-weight:900;
+      letter-spacing:.06em;
+      cursor:pointer;
+      font-size:.85rem;
+      color:#052e16;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 10px 22px rgba(34,197,94,.4);
+    }
+    .reset{
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color:#fff;
+      box-shadow: 0 10px 22px rgba(239,68,68,.4);
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
-<div class="card">
+  <header>
+    <h1>🚌 Confirmação no ônibus – Trilha Morro da Mesa | 22 de fevereiro</h1>
+    <div class="stats">
+      <div class="stat"><b id="okCount">0</b>Confirmados</div>
+      <div class="stat"><b id="noCount">0</b>Não confirmados</div>
+      <div class="stat"><b id="totalCount">0</b>Total</div>
+    </div>
+    <small style="color:#cbd5f5">Toque no nome para confirmar/desmarcar.</small>
+  </header>
 
-<div class="banner">
-<img src="https://i.postimg.cc/FzLnkVc2/Orange-and-Black-Modern-Mountain-Bike-Event-Instagram-Post.png">
-</div>
+  <main>
+    <div id="list" class="list"></div>
+  </main>
 
-<div class="titulo">⛰️ Subida do Morro da Mesa</div>
+  <footer>
+    <button id="exportBtn">Copiar confirmados</button>
+    <button id="resetBtn" class="reset">Resetar tudo</button>
+  </footer>
 
-<div class="descricao">
-📅 22 de fevereiro • ⏰ 02h<br>
-👣 4 km • ⚠️ Nível médio
-</div>
+  <script>
+    const nomes = [
+      "Adriana Pereira Viana","Airton Junio","Ana","Ana Claudia Ribeiro","Aryele","Bruna Maia Fernandes",
+      "Crislaine","Débora Stürmer","Edilane Leal Michiles da Silva","Edelson Santana de Almeida","Edna Andrade",
+      "Elionaldo","Elizabete Tunes","Emelyn Padilha","Francieli","Gabriely Silveira",
+      "Geovana Vitória Arruda Rodrigues","Gustavo","Higor Diogo","Hugo Deleon","Jakeline",
+      "Jaylson Medeiros da Silva","Jefferson Araújo Alves","Jéssyca Fernandes de Oliveira Silva",
+      "Jonatas Marcos","Kamila","Lavinia Barboza Inácio","Lediane","Luiz Eduardo Rezende Camara",
+      "Maiara Alves da Silva Inocêncio","Márcia Campos de Oliveira","Marta Schorn","Míriam Pinto Moreira",
+      "Natan de Araújo Gomes","Nelson Melo","Paula","Patrícia Dall Agnol","Raquel Gama Zaiatz",
+      "Rafael Martins Michiles da Silva","Regina Mingareli","Renata","Robson Ferreira de Oliveira",
+      "Roseli Batista","Ronaldo","Samuel Sousa","Sara Gama Zaiatz","Sassamoto","Sejane","Selma",
+      "Simone Maria Marques","Suely Aparecida","Thaiza Alves Gouveia",
+      "Victoria Roberta Freitas dos Santos","Viviane Sousa de Oliveira"
+    ];
 
-<div class="box-info">
-☕ Levar café • ♻️ Levar lixo<br>
-🚫 Não indicado para iniciantes<br>
-✅ Seguro incluso
-</div>
+    const key = "presenca_trilheiros_v2";
+    const saved = JSON.parse(localStorage.getItem(key) || "{}");
 
-<label>Nome</label>
-<input id="nome">
+    const list = document.getElementById("list");
+    const okCount = document.getElementById("okCount");
+    const noCount = document.getElementById("noCount");
+    const totalCount = document.getElementById("totalCount");
 
-<label>Transporte</label>
-<select id="tipoTransporte" onchange="atualizar()">
-  <option value="onibus">🚌 Ônibus – R$ 85</option>
-  <option value="carro">🚗 Carro próprio – R$ 25</option>
-</select>
+    function render(){
+      list.innerHTML = "";
+      let ok = 0, no = 0;
 
-<label>Quantidade</label>
-<div class="contador">
-<button onclick="menos()">−</button>
-<span id="quantidade">1</span>
-<button onclick="mais()">+</button>
-</div>
+      nomes.forEach((nome) => {
+        const confirmed = !!saved[nome];
+        if (confirmed) ok++; else no++;
 
-<div id="infoVagas" class="info"></div>
-<div id="total" class="total"></div>
+        const item = document.createElement("div");
+        item.className = "item " + (confirmed ? "ok" : "no");
+        item.textContent = nome;
 
-<label>Pagamento</label>
-<select id="formaPagamento">
-  <option value="pix">💚 PIX</option>
-  <option value="cartao">💳 Cartão (ônibus)</option>
-</select>
+        item.onclick = () => {
+          saved[nome] = !saved[nome];
+          localStorage.setItem(key, JSON.stringify(saved));
+          render();
+        };
 
-<button id="btnReservar" class="btn pix" onclick="reservar()">CONFIRMAR PAGAMENTO</button>
+        list.appendChild(item);
+      });
 
-<div id="esgotado" class="esgotado">❌ VAGAS ESGOTADAS</div>
+      okCount.textContent = ok;
+      noCount.textContent = no;
+      totalCount.textContent = nomes.length;
+    }
 
-<button id="btnWhats" class="btn whats" onclick="enviarWhats()">ENVIAR COMPROVANTE</button>
+    document.getElementById("resetBtn").onclick = () => {
+      if (confirm("Tem certeza que deseja zerar todas as confirmações?")) {
+        localStorage.removeItem(key);
+        for (const k in saved) delete saved[k];
+        render();
+      }
+    };
 
-</div>
-</div>
+    document.getElementById("exportBtn").onclick = () => {
+      const confirmados = nomes.filter(n => saved[n]);
+      const texto = confirmados.join("\n");
+      navigator.clipboard.writeText(texto).then(() => {
+        alert("Lista de confirmados copiada!");
+      });
+    };
 
-<script>atualizar();</script>
+    render();
+  </script>
 </body>
 </html>
+
+
