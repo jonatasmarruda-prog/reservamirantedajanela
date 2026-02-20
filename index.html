@@ -46,7 +46,7 @@
       <div class="stat"><b id="noCount">0</b>Não confirmados</div>
       <div class="stat"><b id="totalCount">0</b>Total</div>
     </div>
-    <small style="color:#cbd5f5">Toque no seu nome para confirmar/desmarcar. Atualiza pra todos.</small>
+    <small style="color:#cbd5f5">Toque no seu nome para confirmar/desmarcar.</small>
   </header>
 
   <main>
@@ -54,7 +54,6 @@
     <button id="resetBtn" class="reset">Resetar confirmações</button>
   </main>
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -66,13 +65,11 @@
       projectId: "onibus-morro-da-mesa",
       storageBucket: "onibus-morro-da-mesa.firebasestorage.app",
       messagingSenderId: "21597144482",
-      appId: "1:21597144482:web:93a55c39d477e67c1d5efb",
-      measurementId: "G-WP1BX1H1F0"
+      appId: "1:21597144482:web:93a55c39d477e67c1d5efb"
     };
 
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const ref = db.ref("presencas/morro-da-mesa-22-02");
+    const ref = firebase.database().ref("presencas/morro-da-mesa-22-02");
 
     const nomes = [
       "Adriana Pereira Viana","Airton Junio","Ana","Ana Claudia Ribeiro","Aryele","Bruna Maia Fernandes",
@@ -117,12 +114,7 @@
     }
 
     ref.on("value", (snap) => render(snap.val() || {}));
-
-    document.getElementById("resetBtn").onclick = () => {
-      if (confirm("Tem certeza que deseja zerar TODAS as confirmações?")) {
-        ref.remove();
-      }
-    };
+    document.getElementById("resetBtn").onclick = () => { if(confirm("Zerar tudo?")) ref.remove(); };
   </script>
 </body>
 </html>
